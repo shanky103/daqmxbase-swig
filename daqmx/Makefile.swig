@@ -6,7 +6,7 @@ RUBY=/opt/local/bin/ruby
 NI_DIR=/Applications/National Instruments/NI-DAQmx Base
 NI_INC_DIR=$(NI_DIR)/includes
 
-SWIG_OPTS+=-Wall
+SWIG_OPTS+=-Wall -w322
 CPPFLAGS+=-I \"$(NI_INC_DIR)\"
 CFLAGS+=-Wall -Wno-redundant-decls
 LIBS=-framework nidaqmxbase -framework nidaqmxbaselv
@@ -18,14 +18,16 @@ INTERFACE=$(MODULE).i
 WRAPPER=$(MODULE)_wrap.c
 BUNDLE=$(MODULE).bundle
 
-all: Makefile $(WRAPPER)
-	make all
+all: $(BUNDLE)
+
+$(BUNDLE): Makefile $(WRAPPER)
+	make $@
 
 install: Makefile
 	make install
 
 Makefile: extconf.rb
-	$(RUBY) extconf.rb
+	$(RUBY) -r mkmf extconf.rb
 
 $(WRAPPER): $(INTERFACE)
 	$(SWIG) $(SWIG_OPTS) -ruby "-I$(NI_INC_DIR)" -o $@ $(INTERFACE)
@@ -33,6 +35,7 @@ $(WRAPPER): $(INTERFACE)
 extconf.rb: $(MAKEFILE_LIST)
 	echo 'require "mkmf"' > $@
 	echo '$$CPPFLAGS="$(CPPFLAGS)"' >> $@
+	echo '$$CFLAGS="$(CFLAGS)"' >> $@
 	echo '$$LIBS="$(LIBS)"' >> $@
 	echo 'create_makefile("$(FEATURE)")' >> $@
 
