@@ -1,3 +1,5 @@
+# $Id$
+#
 SWIG=/opt/local/bin/swig
 RUBY=/opt/local/bin/ruby
 
