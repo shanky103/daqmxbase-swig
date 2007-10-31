@@ -11,8 +11,8 @@ CPPFLAGS+=-I \"$(NI_INC_DIR)\"
 CFLAGS+=-Wall -Wno-redundant-decls
 LIBS=-framework nidaqmxbase -framework nidaqmxbaselv
 
-MODULE=dAQmxBase
-FEATURE=DAQmxBase
+MODULE=daqmxbase
+FEATURE=Daqmxbase
 
 INTERFACE=$(MODULE).i
 WRAPPER=$(MODULE)_wrap.c
@@ -34,7 +34,7 @@ extconf.rb: $(MAKEFILE_LIST)
 	echo 'require "mkmf"' > $@
 	echo '$$CPPFLAGS="$(CPPFLAGS)"' >> $@
 	echo '$$LIBS="$(LIBS)"' >> $@
-	echo 'create_makefile("$(MODULE)")' >> $@
+	echo 'create_makefile("$(FEATURE)")' >> $@
 
 clean:
 	@if [ -f Makefile ] ; then\
@@ -44,6 +44,9 @@ clean:
 	rm -f extconf.rb
 
 test: all
-	$(RUBY) -r $(MODULE) -e '$$stdout.sync=true; puts "\nNew methods"; p $(PREFIX)$(FEATURE).methods - Module.methods; puts ""'
+	$(RUBY) -r $(MODULE) -e '$$stdout.sync=true;\
+		puts "\nNew methods";\
+		p $(PREFIX)$(FEATURE).methods - Module.methods;\
+		puts ""'
 
 # vim: filetype=make
