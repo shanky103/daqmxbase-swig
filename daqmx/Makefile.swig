@@ -16,7 +16,7 @@ FEATURE=Daqmxbase
 
 INTERFACE=$(MODULE).i
 WRAPPER=$(MODULE)_wrap.c
-BUNDLE=$(MODULE).bundle
+BUNDLE=$(FEATURE).bundle
 
 all: $(BUNDLE)
 
