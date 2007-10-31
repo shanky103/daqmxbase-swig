@@ -28,7 +28,15 @@
 //     $result = ;
 // }
 
-%inline{
+extern int32 DAQmxBaseLoadTask(const char INPUT[], TaskHandle *OUTPUT);
+extern int32 DAQmxBaseCreateTask(const char INPUT[], TaskHandle *OUTPUT);
+extern int32  DAQmxBaseStartTask(TaskHandle INPUT);
+extern int32  DAQmxBaseStopTask(TaskHandle INPUT);
+extern int32  DAQmxBaseClearTask(TaskHandle INPUT);
+extern int32  DAQmxBaseIsTaskDone(TaskHandle INPUT, bool32 *OUTPUT);
+
+#if 0
+
 // Task Creation
 extern int32  DAQmxBaseLoadTask(const char taskName[], TaskHandle *taskHandle);
 extern int32  DAQmxBaseCreateTask(const char taskName[], TaskHandle *taskHandle);
@@ -84,5 +92,6 @@ extern int32  DAQmxBaseResetDevice(const char deviceName[]);
 extern int32  DAQmxBaseGetExtendedErrorInfo(char errorString[], uInt32 bufferSize);
 extern int32  DAQmxBaseGetDevSerialNum(const char device[], uInt32 *data);
 
+#endif
+
 //  vim: filetype=swig
-}

@@ -1,33 +1,50 @@
 SWIG=/opt/local/bin/swig
+RUBY=/opt/local/bin/ruby
+
 NI_DIR=/Applications/National Instruments/NI-DAQmx Base
 NI_INC_DIR=$(NI_DIR)/includes
-DAQMXBASE=daqmxbase
+
+SWIG_OPTS+=-Wall -Wredundant-decls
+FEATURE=DAQMXBASE
+MODULE=daqmxbase
 CPPFLAGS=-I \"$(NI_INC_DIR)\"
 LIBS=-framework nidaqmxbase -framework nidaqmxbaselv
 RUBY=/usr/bin/ruby
+INTERFACE=$(MODULE).i
+WRAPPER=$(MODULE)_wrap.c
+BUNDLE=$(MODULE).bundle
 
-all: $(DAQMXBASE).bundle
+swigall: $(BUNDLE)
 
 install: Makefile
 	make install
 
 Makefile: extconf.rb
-	ruby extconf.rb 
+	$(RUBY) extconf.rb
 
-$(DAQMXBASE).bundle: Makefile $(DAQMXBASE).c
+# 	@if [ -f Makefile ] ; then\
+# 		echo "include Makefile.swig" >> Makefile;\
+# 	fi
+
+$(BUNDLE): Makefile $(WRAPPER)
 	make
 
-$(DAQMXBASE).c: $(DAQMXBASE).i
-	$(SWIG) -ruby "-I$(NI_INC_DIR)" $<
+$(WRAPPER): $(INTERFACE)
+	$(SWIG) $(SWIG_OPTS) -ruby "-I$(NI_INC_DIR)" -o $@ $(INTERFACE)
 
 extconf.rb: $(MAKEFILE_LIST)
 	echo 'require "mkmf"' > $@
 	echo '$$CPPFLAGS="$(CPPFLAGS)"' >> $@
 	echo '$$LIBS="$(LIBS)"' >> $@
-	echo 'create_makefile("$(DAQMXBASE)")' >> $@
+	echo 'create_makefile("$(MODULE)")' >> $@
 
-clean:
-	rm extconf.rb Makefile *.o *.bundle
+swigclean:
+	@if [ -f Makefile ] ; then\
+		make -f Makefile clean;\
+	fi
+	rm -f Makefile $(WRAPPER)
+	rm -f extconf.rb *.o $(BUNDLE)
 
-test: $(DAQMXBASE).bundle
-	$(RUBY) -r ./daqmxbase -e '$$stdout.sync=true; p Daqmxbase.methods - Module.methods'
+test: $(BUNDLE)
+	$(RUBY) -r ./$(MODULE) -e '$$stdout.sync=true; p $(FEATURE).methods - Module.methods'
+
