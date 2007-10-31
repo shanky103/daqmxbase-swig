@@ -4,9 +4,9 @@ RUBY=/opt/local/bin/ruby
 NI_DIR=/Applications/National Instruments/NI-DAQmx Base
 NI_INC_DIR=$(NI_DIR)/includes
 
-SWIG_OPTS+=-Wall -w322
+SWIG_OPTS+=-Wall
 CPPFLAGS+=-I \"$(NI_INC_DIR)\"
-CFLAGS+=-Wredundant-decls
+CFLAGS+=-Wall -Wno-redundant-decls
 LIBS=-framework nidaqmxbase -framework nidaqmxbaselv
 
 FEATURE=Daqmxbase
