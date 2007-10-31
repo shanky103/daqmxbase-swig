@@ -2,3 +2,5 @@ set path+=/Applications/National\\\ Instruments/NI-DAQmx\\\ Base/includes,/usr/l
 set makeprg=make\ -f\ Makefile.swig
 set isfname+=\ 
 set errorformat^=%f:%l:\ %m
+au BufNewFile,BufRead Makefile* setf make
+au BufNewFile,BufRead *.i setf swig
