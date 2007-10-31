@@ -20,13 +20,13 @@ BUNDLE=$(FEATURE).bundle
 
 all: $(BUNDLE)
 
-$(BUNDLE): Makefile $(WRAPPER)
+$(BUNDLE): Makefile
 	make $@
 
 install: Makefile
 	make install
 
-Makefile: extconf.rb
+Makefile: $(WRAPPER) extconf.rb
 	$(RUBY) -r mkmf extconf.rb
 
 $(WRAPPER): $(INTERFACE)
