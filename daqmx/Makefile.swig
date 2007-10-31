@@ -11,22 +11,21 @@ CPPFLAGS+=-I \"$(NI_INC_DIR)\"
 CFLAGS+=-Wall -Wno-redundant-decls
 LIBS=-framework nidaqmxbase -framework nidaqmxbaselv
 
-FEATURE=Daqmxbase
-MODULE=daqmxbase
+MODULE=dAQmxBase
+FEATURE=DAQmxBase
+
 INTERFACE=$(MODULE).i
 WRAPPER=$(MODULE)_wrap.c
 BUNDLE=$(MODULE).bundle
 
-all: $(BUNDLE)
+all: Makefile $(WRAPPER)
+	make all
 
 install: Makefile
 	make install
 
 Makefile: extconf.rb
 	$(RUBY) extconf.rb
-
-$(BUNDLE): Makefile $(WRAPPER)
-	make $(BUNDLE)
 
 $(WRAPPER): $(INTERFACE)
 	$(SWIG) $(SWIG_OPTS) -ruby "-I$(NI_INC_DIR)" -o $@ $(INTERFACE)
@@ -42,10 +41,9 @@ clean:
 		make -f Makefile clean;\
 	fi
 	rm -f Makefile $(WRAPPER)
-	rm -f extconf.rb *.o $(BUNDLE)
+	rm -f extconf.rb
 
-test: $(BUNDLE)
-	$(RUBY) -r ./$(MODULE) -e '$$stdout.sync=true; p $(FEATURE).methods - Module.methods'
-
+test: all
+	$(RUBY) -r $(MODULE) -e '$$stdout.sync=true; puts "\nNew methods"; p $(PREFIX)$(FEATURE).methods - Module.methods; puts ""'
 
 # vim: filetype=make

@@ -3,8 +3,8 @@
 // Ned Konz, November 1 2007
 // $Id$
 
-// Will be Ruby module named Ni::Daqmx::Base
-%module  daqmxbase
+// Will be Ruby module named DAQmxBase
+%module  dAQmxBase
 
 %include "typemaps.i"
 %include "exception.i"
