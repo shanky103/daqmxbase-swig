@@ -4,7 +4,7 @@
 // $Id$
 
 // Will be Ruby module named Ni::Daqmx::Base
-%module  daqmx
+%module  daqmxbase
 
 %include "typemaps.i"
 %include "exception.i"
