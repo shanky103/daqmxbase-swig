@@ -2,19 +2,6 @@ require "daqmxbase"
 
 class MyTest
 
-  def self.daqmx_err_chk(retcode)
-    return 0 if retcode.zero?
-    err_buff = " " * 2048
-    err_buff = Daqmxbase::daqmx_base_get_extended_error_info(err_buff.size)
-    if retcode < 0
-      printf("Error %d: %s\n", retcode, err_buff)
-      exit(1)
-    elsif retcode > 0
-      printf("Warning %d: %s\n", retcode, err_buff)
-    end
-    return retcode
-  end
-
   def self.testOne
     err_code = nil
     chan = "Dev1/ai0"
@@ -27,21 +14,19 @@ class MyTest
     data = nil
     points_read = nil
 
-    (err_code, task_handle) = Daqmxbase::daqmx_base_create_task("")
+    task = Daqmxbase::Task.new
 
-    daqmx_err_chk(err_code)
+    errCode = Daqmxbase::create_task("", task)
+    p errCode, task
 
-    daqmx_err_chk(Daqmxbase::daqmx_base_create_aivoltage_chan(task_handle,chan,"",Daqmxbase::DAQMX_VAL_CFG_DEFAULT,min,max,Daqmxbase::DAQMX_VAL_VOLTS, nil))
+    task.create_aivoltage_chan(chan,"",Daqmxbase::VAL_CFG_DEFAULT,min,max,Daqmxbase::VAL_VOLTS, nil)
+    task.start_task()
 
-    daqmx_err_chk(Daqmxbase::daqmx_base_start_task(task_handle))
-    (err_code, data, points_read) = Daqmxbase::daqmx_base_read_analog_f_64(task_handle, points_to_read, timeout, Daqmxbase::DAQMX_VAL_GROUPBYCHANNEL, samples_per_chan)
-    daqmx_err_chk(err_code)
+    (err_code, data, points_read) = task.read_analog_f64(points_to_read, timeout, Daqmxbase::VAL_GROUP_BY_CHANNEL, samples_per_chan)
     printf("Acquired reading: %f\n", data)
 
-    if task_handle
-      Daqmxbase::daqmx_base_stop_task(task_handle)
-      Daqmxbase::daqmx_base_clear_task(task_handle)
-    end
+    task.stop_task()
+    task.clear_task()
   end
 
 end

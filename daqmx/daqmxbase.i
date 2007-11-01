@@ -21,8 +21,6 @@ extern  int32 handle_DAQmx_error(const char *funcName, int32 errCode);
 // patch typo in header file
 #define  DAQmxReadBinaryI32  DAQmxBaseReadBinaryI32
 
-%apply  unsigned long *INPUT { TaskHandle };
-%apply  unsigned long *OUTPUT { TaskHandle * };
 %apply  unsigned long *OUTPUT { bool32 * };
 %apply  unsigned long *OUTPUT { int32 * };
 %apply  char *OUTPUT { char errorString[] };

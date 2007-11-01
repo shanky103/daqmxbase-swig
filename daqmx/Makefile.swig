@@ -3,12 +3,9 @@
 SWIG=/opt/local/bin/swig
 RUBY=/opt/local/bin/ruby
 
-SPACE:= # space at end
-QUOTED_SPACE:=\ # space at end
 NI_DIR:=/Applications/National Instruments/NI-DAQmx Base
 NI_INC_DIR:=$(NI_DIR)/includes
 NI_HEADER:=/Applications/National\ Instruments/NI-DAQmx\ Base/includes/NIDAQmxBase.h
-# NI_HEADER:=$(subst $(SPACE),$(QUOTED_SPACE),$(NI_INC_DIR))/NIDAQmxBase.h
 
 SWIG_OPTS+=-v -ruby -Wall -w+322  -Fstandard
 CPPFLAGS+=-I \"$(NI_INC_DIR)\"
