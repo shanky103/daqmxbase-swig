@@ -15,6 +15,7 @@
 // patch typo in header file
 #define  DAQmxReadBinaryI32  DAQmxBaseReadBinaryI32
 #include "NIDAQmxBase.h"
+extern  int32 handle_DAQmx_error(const char *funcName, int32 errCode);
 %}
 
 // patch typo in header file
@@ -27,11 +28,11 @@
 %apply  char *OUTPUT { char errorString[] };
 %apply  float *OUTPUT { float64 readArray[] };
 %apply  float *OUTPUT { float64 *value };
-%apply  unsigned long *OUTPUT { uint32 *value };
+%apply  unsigned long *OUTPUT { uInt32 *value };
 %apply  short *OUTPUT { int16 readArray[] };
 %apply  long *OUTPUT { int32 readArray[] };
-%apply  unsigned char *OUTPUT { uint8 readArray[] };
-%apply  unsigned long *OUTPUT { uint32 readArray[] };
+%apply  unsigned char *OUTPUT { uInt8 readArray[] };
+%apply  unsigned long *OUTPUT { uInt32 readArray[] };
 
 // TODO: handle error codes using exceptions
 // %exception
@@ -40,8 +41,8 @@
 //     $result = ;
 // }
 
-%include "NIDAQmxBase.h"
 
 %include "daqmxbase_decls.i"
+%include "NIDAQmxBase.h"
 
 //  vim: filetype=swig

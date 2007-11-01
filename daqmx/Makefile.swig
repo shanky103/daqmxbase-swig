@@ -10,7 +10,7 @@ NI_INC_DIR:=$(NI_DIR)/includes
 NI_HEADER:=/Applications/National\ Instruments/NI-DAQmx\ Base/includes/NIDAQmxBase.h
 # NI_HEADER:=$(subst $(SPACE),$(QUOTED_SPACE),$(NI_INC_DIR))/NIDAQmxBase.h
 
-SWIG_OPTS+=-v -ruby -autorename -Wall -w+322  -Fstandard
+SWIG_OPTS+=-v -ruby -Wall -w+322  -Fstandard
 CPPFLAGS+=-I \"$(NI_INC_DIR)\"
 CFLAGS+=-g -Wall -Wno-redundant-decls
 LIBS=-framework nidaqmxbase -framework nidaqmxbaselv
@@ -57,11 +57,8 @@ clean:
 	rm -f Makefile $(WRAPPER)
 	rm -f extconf.rb .gdbinit
 
-testload.rb: $(MAKEFILE_LIST)
-	echo >$@ 'require "$(MODULE)"; $$stdout.sync=true; puts "\nNew methods"; p $(PREFIX)$(FEATURE).methods - Module.methods; puts ""'
-
 test: $(BUNDLE) testload.rb
-	$(RUBY) testload.rb
+	$(RUBY) -w testload.rb
 
 debug: $(BUNDLE) testload.rb .gdbinit 
 
