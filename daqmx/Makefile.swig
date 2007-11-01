@@ -6,7 +6,7 @@ RUBY=/opt/local/bin/ruby
 NI_DIR=/Applications/National Instruments/NI-DAQmx Base
 NI_INC_DIR=$(NI_DIR)/includes
 
-SWIG_OPTS+=-Wall -w322
+SWIG_OPTS+=-v -Wall -w322
 CPPFLAGS+=-I \"$(NI_INC_DIR)\"
 CFLAGS+=-Wall -Wno-redundant-decls
 LIBS=-framework nidaqmxbase -framework nidaqmxbaselv
@@ -34,9 +34,9 @@ $(WRAPPER): $(INTERFACE)
 
 extconf.rb: $(MAKEFILE_LIST)
 	echo 'require "mkmf"' > $@
-	echo '$$CPPFLAGS="$(CPPFLAGS)"' >> $@
-	echo '$$CFLAGS="$(CFLAGS)"' >> $@
-	echo '$$LIBS="$(LIBS)"' >> $@
+	echo '$$CPPFLAGS<<" $(CPPFLAGS) "' >> $@
+	echo '$$CFLAGS<<" $(CFLAGS) "' >> $@
+	echo '$$LIBS<<" $(LIBS) "' >> $@
 	echo 'create_makefile("$(FEATURE)")' >> $@
 
 clean:
@@ -44,12 +44,20 @@ clean:
 		make -f Makefile clean;\
 	fi
 	rm -f Makefile $(WRAPPER)
-	rm -f extconf.rb
+	rm -f extconf.rb .gdbinit
 
-test: all
-	$(RUBY) -r $(MODULE) -e '$$stdout.sync=true;\
-		puts "\nNew methods";\
-		p $(PREFIX)$(FEATURE).methods - Module.methods;\
-		puts ""'
+testload.rb: $(MAKEFILE_LIST)
+	echo >$@ 'require "$(MODULE)"; $$stdout.sync=true; puts "\nNew methods"; p $(PREFIX)$(FEATURE).methods - Module.methods; puts ""'
+
+test: $(BUNDLE) testload.rb
+	$(RUBY) testload.rb
+
+debug: $(BUNDLE) testload.rb .gdbinit 
+
+.gdbinit: $(MAKEFILE_LIST)
+	echo > $@ "set args testload.rb"
+	echo >>$@ "set print demangle"
+	echo >>$@ "handle SIGABRT stop"
+	gdb -x $@ $(RUBY)
 
 # vim: filetype=make
