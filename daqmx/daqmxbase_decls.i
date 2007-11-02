@@ -8,10 +8,10 @@
 # include <stdlib.h>
 # include "ruby.h"
 
-  int32 handle_DAQmx_error(const char *funcName, int32 errCode)
+  int32 handle_DAQmx_error(int32 errCode)
   {
-    static const char errorSeparator[] = ": ERROR : ";
-    static const char warningSeparator[] = ": WARNING : ";
+    static const char errorSeparator[] = "ERROR : ";
+    static const char warningSeparator[] = "WARNING : ";
     static const char *separator;
     size_t errorBufferSize;
     size_t prefixLength;
@@ -22,9 +22,8 @@
 
     separator = errCode < 0 ? errorSeparator : warningSeparator;
     errorBufferSize = (size_t)DAQmxBaseGetExtendedErrorInfo(NULL, 0);
-    prefixLength = strlen(funcName) + strlen(separator);
+    prefixLength = strlen(separator);
     errorBuffer = malloc(prefixLength + errorBufferSize);
-    strcpy(errorBuffer, funcName);
     strcat(errorBuffer, separator);
     int32 status = DAQmxBaseGetExtendedErrorInfo(errorBuffer + prefixLength,
       (uInt32)errorBufferSize);
@@ -719,7 +718,7 @@
     %inline {
       int32 load_task(const char taskName[], TaskHandle *taskHandle) {
         int32 result = DAQmxBaseLoadTask(taskName, taskHandle);
-        if (result) handle_DAQmx_error("load_task", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -728,7 +727,7 @@
     %inline {
       int32 create_task(const char taskName[], Task *taskHandle) {
         int32 result = DAQmxBaseCreateTask(taskName, (TaskHandle *)taskHandle);
-        if (result) handle_DAQmx_error("create_task", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -737,7 +736,7 @@
     %extend Task {
       int32 start_task() {
         int32 result = DAQmxBaseStartTask((TaskHandle)$self);
-        if (result) handle_DAQmx_error("start_task", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -746,7 +745,7 @@
     %extend Task {
       int32 stop_task() {
         int32 result = DAQmxBaseStopTask((TaskHandle)$self);
-        if (result) handle_DAQmx_error("stop_task", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -755,7 +754,7 @@
     %extend Task {
       int32 clear_task() {
         int32 result = DAQmxBaseClearTask((TaskHandle)$self);
-        if (result) handle_DAQmx_error("clear_task", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -764,7 +763,7 @@
     %extend Task {
       int32 is_task_done(bool32 *isTaskDone) {
         int32 result = DAQmxBaseIsTaskDone((TaskHandle)$self, isTaskDone);
-        if (result) handle_DAQmx_error("is_task_done", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -773,7 +772,7 @@
     %extend Task {
       int32 create_aivoltage_chan(const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, const char customScaleName[]) {
         int32 result = DAQmxBaseCreateAIVoltageChan((TaskHandle)$self, physicalChannel, nameToAssignToChannel, terminalConfig, minVal, maxVal, units, customScaleName);
-        if (result) handle_DAQmx_error("create_aivoltage_chan", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -782,7 +781,7 @@
     %extend Task {
       int32 create_aithrmcpl_chan(const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 thermocoupleType, int32 cjcSource, float64 cjcVal, const char cjcChannel[]) {
         int32 result = DAQmxBaseCreateAIThrmcplChan((TaskHandle)$self, physicalChannel, nameToAssignToChannel, minVal, maxVal, units, thermocoupleType, cjcSource, cjcVal, cjcChannel);
-        if (result) handle_DAQmx_error("create_aithrmcpl_chan", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -791,7 +790,7 @@
     %extend Task {
       int32 create_aovoltage_chan(const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, const char customScaleName[]) {
         int32 result = DAQmxBaseCreateAOVoltageChan((TaskHandle)$self, physicalChannel, nameToAssignToChannel, minVal, maxVal, units, customScaleName);
-        if (result) handle_DAQmx_error("create_aovoltage_chan", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -800,7 +799,7 @@
     %extend Task {
       int32 create_dichan(const char lines[], const char nameToAssignToLines[], int32 lineGrouping) {
         int32 result = DAQmxBaseCreateDIChan((TaskHandle)$self, lines, nameToAssignToLines, lineGrouping);
-        if (result) handle_DAQmx_error("create_dichan", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -809,7 +808,7 @@
     %extend Task {
       int32 create_dochan(const char lines[], const char nameToAssignToLines[], int32 lineGrouping) {
         int32 result = DAQmxBaseCreateDOChan((TaskHandle)$self, lines, nameToAssignToLines, lineGrouping);
-        if (result) handle_DAQmx_error("create_dochan", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -818,7 +817,7 @@
     %extend Task {
       int32 create_ciperiod_chan(const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 edge, int32 measMethod, float64 measTime, uInt32 divisor, const char customScaleName[]) {
         int32 result = DAQmxBaseCreateCIPeriodChan((TaskHandle)$self, counter, nameToAssignToChannel, minVal, maxVal, units, edge, measMethod, measTime, divisor, customScaleName);
-        if (result) handle_DAQmx_error("create_ciperiod_chan", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -827,7 +826,7 @@
     %extend Task {
       int32 create_cicount_edges_chan(const char counter[], const char nameToAssignToChannel[], int32 edge, uInt32 initialCount, int32 countDirection) {
         int32 result = DAQmxBaseCreateCICountEdgesChan((TaskHandle)$self, counter, nameToAssignToChannel, edge, initialCount, countDirection);
-        if (result) handle_DAQmx_error("create_cicount_edges_chan", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -836,7 +835,7 @@
     %extend Task {
       int32 create_cipulse_width_chan(const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 startingEdge, const char customScaleName[]) {
         int32 result = DAQmxBaseCreateCIPulseWidthChan((TaskHandle)$self, counter, nameToAssignToChannel, minVal, maxVal, units, startingEdge, customScaleName);
-        if (result) handle_DAQmx_error("create_cipulse_width_chan", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -845,7 +844,7 @@
     %extend Task {
       int32 create_copulse_chan_freq(const char counter[], const char nameToAssignToChannel[], int32 units, int32 idleState, float64 initialDelay, float64 freq, float64 dutyCycle) {
         int32 result = DAQmxBaseCreateCOPulseChanFreq((TaskHandle)$self, counter, nameToAssignToChannel, units, idleState, initialDelay, freq, dutyCycle);
-        if (result) handle_DAQmx_error("create_copulse_chan_freq", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -854,7 +853,7 @@
     %extend Task {
       int32 cfg_samp_clk_timing(const char source[], float64 rate, int32 activeEdge, int32 sampleMode, uInt64 sampsPerChan) {
         int32 result = DAQmxBaseCfgSampClkTiming((TaskHandle)$self, source, rate, activeEdge, sampleMode, sampsPerChan);
-        if (result) handle_DAQmx_error("cfg_samp_clk_timing", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -863,7 +862,7 @@
     %extend Task {
       int32 cfg_implicit_timing(int32 sampleMode, uInt64 sampsPerChan) {
         int32 result = DAQmxBaseCfgImplicitTiming((TaskHandle)$self, sampleMode, sampsPerChan);
-        if (result) handle_DAQmx_error("cfg_implicit_timing", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -872,7 +871,7 @@
     %extend Task {
       int32 disable_start_trig() {
         int32 result = DAQmxBaseDisableStartTrig((TaskHandle)$self);
-        if (result) handle_DAQmx_error("disable_start_trig", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -881,7 +880,7 @@
     %extend Task {
       int32 cfg_dig_edge_start_trig(const char triggerSource[], int32 triggerEdge) {
         int32 result = DAQmxBaseCfgDigEdgeStartTrig((TaskHandle)$self, triggerSource, triggerEdge);
-        if (result) handle_DAQmx_error("cfg_dig_edge_start_trig", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -890,7 +889,7 @@
     %extend Task {
       int32 cfg_anlg_edge_start_trig(const char triggerSource[], int32 triggerSlope, float64 triggerLevel) {
         int32 result = DAQmxBaseCfgAnlgEdgeStartTrig((TaskHandle)$self, triggerSource, triggerSlope, triggerLevel);
-        if (result) handle_DAQmx_error("cfg_anlg_edge_start_trig", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -899,7 +898,7 @@
     %extend Task {
       int32 disable_ref_trig() {
         int32 result = DAQmxBaseDisableRefTrig((TaskHandle)$self);
-        if (result) handle_DAQmx_error("disable_ref_trig", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -908,7 +907,7 @@
     %extend Task {
       int32 cfg_dig_edge_ref_trig(const char triggerSource[], int32 triggerEdge, uInt32 pretriggerSamples) {
         int32 result = DAQmxBaseCfgDigEdgeRefTrig((TaskHandle)$self, triggerSource, triggerEdge, pretriggerSamples);
-        if (result) handle_DAQmx_error("cfg_dig_edge_ref_trig", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -917,7 +916,7 @@
     %extend Task {
       int32 cfg_anlg_edge_ref_trig(const char triggerSource[], int32 triggerSlope, float64 triggerLevel, uInt32 pretriggerSamples) {
         int32 result = DAQmxBaseCfgAnlgEdgeRefTrig((TaskHandle)$self, triggerSource, triggerSlope, triggerLevel, pretriggerSamples);
-        if (result) handle_DAQmx_error("cfg_anlg_edge_ref_trig", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -926,7 +925,7 @@
     %extend Task {
       int32 read_analog_f64(int32 numSampsPerChan, float64 timeout, bool32 fillMode, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved) {
         int32 result = DAQmxBaseReadAnalogF64((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved);
-        if (result) handle_DAQmx_error("read_analog_f64", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -935,7 +934,7 @@
     %extend Task {
       int32 read_binary_i16(int32 numSampsPerChan, float64 timeout, bool32 fillMode, int16 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved) {
         int32 result = DAQmxBaseReadBinaryI16((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved);
-        if (result) handle_DAQmx_error("read_binary_i16", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -944,7 +943,7 @@
     %extend Task {
       int32 read_binary_i32(int32 numSampsPerChan, float64 timeout, bool32 fillMode, int32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved) {
         int32 result = DAQmxBaseReadBinaryI32((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved);
-        if (result) handle_DAQmx_error("read_binary_i32", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -953,7 +952,7 @@
     %extend Task {
       int32 read_digital_u8(int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt8 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved) {
         int32 result = DAQmxBaseReadDigitalU8((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved);
-        if (result) handle_DAQmx_error("read_digital_u8", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -962,7 +961,7 @@
     %extend Task {
       int32 read_digital_u32(int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved) {
         int32 result = DAQmxBaseReadDigitalU32((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved);
-        if (result) handle_DAQmx_error("read_digital_u32", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -971,7 +970,7 @@
     %extend Task {
       int32 read_digital_scalar_u32(float64 timeout, uInt32 *value, bool32 *reserved) {
         int32 result = DAQmxBaseReadDigitalScalarU32((TaskHandle)$self, timeout, value, reserved);
-        if (result) handle_DAQmx_error("read_digital_scalar_u32", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -980,7 +979,7 @@
     %extend Task {
       int32 read_counter_f64(int32 numSampsPerChan, float64 timeout, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved) {
         int32 result = DAQmxBaseReadCounterF64((TaskHandle)$self, numSampsPerChan, timeout, readArray, arraySizeInSamps, sampsPerChanRead, reserved);
-        if (result) handle_DAQmx_error("read_counter_f64", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -989,7 +988,7 @@
     %extend Task {
       int32 read_counter_u32(int32 numSampsPerChan, float64 timeout, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved) {
         int32 result = DAQmxBaseReadCounterU32((TaskHandle)$self, numSampsPerChan, timeout, readArray, arraySizeInSamps, sampsPerChanRead, reserved);
-        if (result) handle_DAQmx_error("read_counter_u32", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -998,7 +997,7 @@
     %extend Task {
       int32 read_counter_scalar_f64(float64 timeout, float64 *value, bool32 *reserved) {
         int32 result = DAQmxBaseReadCounterScalarF64((TaskHandle)$self, timeout, value, reserved);
-        if (result) handle_DAQmx_error("read_counter_scalar_f64", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -1007,7 +1006,7 @@
     %extend Task {
       int32 read_counter_scalar_u32(float64 timeout, uInt32 *value, bool32 *reserved) {
         int32 result = DAQmxBaseReadCounterScalarU32((TaskHandle)$self, timeout, value, reserved);
-        if (result) handle_DAQmx_error("read_counter_scalar_u32", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -1016,7 +1015,7 @@
     %extend Task {
       int32 write_analog_f64(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, float64 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved) {
         int32 result = DAQmxBaseWriteAnalogF64((TaskHandle)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved);
-        if (result) handle_DAQmx_error("write_analog_f64", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -1025,7 +1024,7 @@
     %extend Task {
       int32 write_digital_u8(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt8 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved) {
         int32 result = DAQmxBaseWriteDigitalU8((TaskHandle)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved);
-        if (result) handle_DAQmx_error("write_digital_u8", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -1034,7 +1033,7 @@
     %extend Task {
       int32 write_digital_u32(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt32 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved) {
         int32 result = DAQmxBaseWriteDigitalU32((TaskHandle)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved);
-        if (result) handle_DAQmx_error("write_digital_u32", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -1043,7 +1042,7 @@
     %extend Task {
       int32 write_digital_scalar_u32(bool32 autoStart, float64 timeout, uInt32 value, bool32 *reserved) {
         int32 result = DAQmxBaseWriteDigitalScalarU32((TaskHandle)$self, autoStart, timeout, value, reserved);
-        if (result) handle_DAQmx_error("write_digital_scalar_u32", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -1052,7 +1051,7 @@
     %extend Task {
       int32 cfg_input_buffer(uInt32 numSampsPerChan) {
         int32 result = DAQmxBaseCfgInputBuffer((TaskHandle)$self, numSampsPerChan);
-        if (result) handle_DAQmx_error("cfg_input_buffer", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -1117,7 +1116,7 @@
     %inline {
       int32 reset_device(const char deviceName[]) {
         int32 result = DAQmxBaseResetDevice(deviceName);
-        if (result) handle_DAQmx_error("reset_device", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -1126,7 +1125,7 @@
     %inline {
       int32 get_extended_error_info(char errorString[], uInt32 bufferSize) {
         int32 result = DAQmxBaseGetExtendedErrorInfo(errorString, bufferSize);
-        if (result) handle_DAQmx_error("get_extended_error_info", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
@@ -1135,7 +1134,7 @@
     %inline {
       int32 get_dev_serial_num(const char device[], uInt32 *data) {
         int32 result = DAQmxBaseGetDevSerialNum(device, data);
-        if (result) handle_DAQmx_error("get_dev_serial_num", result);
+        if (result) handle_DAQmx_error(result);
         return result;
       }
     };
