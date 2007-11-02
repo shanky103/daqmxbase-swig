@@ -5,6 +5,7 @@
 %{
 # include <string.h>
 # include <stdlib.h>
+# include "ruby.h"
 
   int32 handle_DAQmx_error(const char *funcName, int32 errCode)
   {
@@ -15,6 +16,9 @@
     size_t prefixLength;
     char *errorBuffer;
 
+    if (errCode == 0)
+      return 0;
+
     separator = errCode < 0 ? errorSeparator : warningSeparator;
     errorBufferSize = (size_t)DAQmxBaseGetExtendedErrorInfo(NULL, 0);
     prefixLength = strlen(funcName) + strlen(separator);
@@ -23,9 +27,28 @@
     strcat(errorBuffer, separator);
     int32 status = DAQmxBaseGetExtendedErrorInfo(errorBuffer + prefixLength,
       (uInt32)errorBufferSize);
+
+    if (errCode < 0)
+      rb_raise(rb_eRuntimeError, errorBuffer);
+    else if (errCode > 0)
+      rb_raise(rb_eException, errorBuffer);
+
     return errCode;
   }
 %};
+
+// pass string and size to C function
+%typemap(in) (char *str, int len) {
+  $1 = STR2CSTR($input);
+  $2 = (int) RSTRING($input)->len;
+};
+
+// pass array and size to C function
+%typemap(in) (float64 readArray[], uInt32 arraySizeInSamps) {
+  $1 = (float64 *) RARRAY($input)->ptr;
+  $2 = (uInt32) RARRAY($input)->len;
+};
+
 %rename("SELF_CAL_SUPPORTED") DAQmx_SelfCal_Supported;
 %rename("SELF_CAL_LAST_TEMP") DAQmx_SelfCal_LastTemp;
 %rename("EXT_CAL_RECOMMENDED_INTERVAL") DAQmx_ExtCal_RecommendedInterval;
