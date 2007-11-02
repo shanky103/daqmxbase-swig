@@ -1,7 +1,7 @@
 // $Id$
 // Note that TaskHandle is typedef'd as uInt32*
 %inline{
-  typedef struct Task { uInt32 *handle; } Task;
+  typedef struct Task { uInt32 handle; } Task;
 };
 %{
 # include <string.h>
