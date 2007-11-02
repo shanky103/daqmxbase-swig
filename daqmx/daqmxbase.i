@@ -20,8 +20,8 @@
 #define  DAQmxReadBinaryI32  DAQmxBaseReadBinaryI32
 #include "NIDAQmxBase.h"
 
-static VALUE dmxError = rb_define_class("DAQmxBaseError", rb_eRuntimeError);
-static VALUE dmxWarning = rb_define_class("DAQmxBaseWarning", rb_eRuntimeError);
+static VALUE dmxError = Qnil;
+static VALUE dmxWarning = Qnil;
 
 int32 handle_DAQmx_error(int32 errCode)
 {
@@ -43,9 +43,17 @@ int32 handle_DAQmx_error(int32 errCode)
   DAQmxBaseGetExtendedErrorInfo(errorBuffer + prefixLength, (uInt32)errorBufferSize);
 
   if (errCode < 0)
+  {
+    if (dmxError == Qnil)
+      dmxError = rb_define_class("DAQmxBaseError", rb_eRuntimeError);
     rb_raise(dmxError, errorBuffer);
+  }
   else if (errCode > 0)
+  {
+    if (dmxWarning == Qnil)
+      dmxWarning = rb_define_class("DAQmxBaseWarning", rb_eRuntimeError);
     rb_raise(dmxWarning, errorBuffer);
+  }
 
   return errCode;
 }
@@ -73,8 +81,7 @@ int32 handle_DAQmx_error(int32 errCode)
   if (len <= 0)
     rb_raise(rb_eRangeError, "readArray size must be > 0 (but got %ld)", len);
 
-  temp = calloc((size_t)len, sizeof(int16));
-  $1 = temp;
+  $1 = calloc((size_t)len, sizeof(int16));
   $2 = (uInt32)len;
 };
 
@@ -89,11 +96,11 @@ int32 handle_DAQmx_error(int32 errCode)
   // result is return val from function
   if (result != 0)
   {
-    $result = NULL;
+    $result = Qnil;
     free($1);
     handle_DAQmx_error(result);
-    return NULL;
   }
+
   // create Ruby array of given length
   $result = rb_ary_new2($2);
 
