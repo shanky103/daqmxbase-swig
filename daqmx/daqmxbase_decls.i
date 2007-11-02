@@ -1,71 +1,4 @@
 // $Id$
-// Note that TaskHandle is typedef'd as uInt32*
-// so here &someTask is equivalent to a TaskHandle.
-%inline{
-  typedef struct Task { uInt32 handle; } Task;
-};
-%{
-# include <string.h>
-# include <stdlib.h>
-# include "ruby.h"
-
-  int32 handle_DAQmx_error(int32 errCode)
-  {
-    static const char errorSeparator[] = "ERROR : ";
-    static const char warningSeparator[] = "WARNING : ";
-    static const char *separator;
-    size_t errorBufferSize;
-    size_t prefixLength;
-    char *errorBuffer;
-
-    if (errCode == 0)
-      return 0;
-
-    separator = errCode < 0 ? errorSeparator : warningSeparator;
-    errorBufferSize = (size_t)DAQmxBaseGetExtendedErrorInfo(NULL, 0);
-    prefixLength = strlen(separator);
-    errorBuffer = malloc(prefixLength + errorBufferSize);
-    strcat(errorBuffer, separator);
-    DAQmxBaseGetExtendedErrorInfo(errorBuffer + prefixLength, (uInt32)errorBufferSize);
-    if (errCode < 0)
-      rb_raise(rb_eRuntimeError, errorBuffer);
-    else if (errCode > 0)
-      rb_raise(rb_eException, errorBuffer);
-
-    return errCode;
-  }
-%};
-
-// pass string and size to C function
-%typemap(in) (char *str, int len) {
-  $1 = STR2CSTR($input);
-  $2 = (int) RSTRING($input)->len;
-};
-
-// pass array and size to C function
-%typemap(in) (float64 readArray[], uInt32 arraySizeInSamps) {
-  $1 = (float64 *) RARRAY($input)->ptr;
-  $2 = (uInt32) RARRAY($input)->len;
-};
-
-%extend Task {
-  // if you give a non-empty name, you get LoadTask, else CreateTask.
-  Task(const char taskName[]) {
-    Task *t = (Task *)calloc(1, sizeof(Task));
-    int32 result;
-    if (&taskName[0] == NULL || taskName[0] == '\0')
-      result = DAQmxBaseCreateTask(taskName, (TaskHandle *)&t);
-    else
-      result = DAQmxBaseLoadTask(taskName, (TaskHandle *)&t);
-    if (result) handle_DAQmx_error(result);
-    return t;
-  }
-  ~Task() {
-    int32 result = DAQmxBaseStopTask((TaskHandle)$self);
-    result = DAQmxBaseClearTask((TaskHandle)$self);
-    free($self);
-  }
-};
 %rename("SELF_CAL_SUPPORTED") DAQmx_SelfCal_Supported;
 %rename("SELF_CAL_LAST_TEMP") DAQmx_SelfCal_LastTemp;
 %rename("EXT_CAL_RECOMMENDED_INTERVAL") DAQmx_ExtCal_RecommendedInterval;
@@ -940,8 +873,8 @@
 // DAQmxBaseReadAnalogF64(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
 %ignore DAQmxBaseReadAnalogF64;
     %extend Task {
-      int32 read_analog_f64(int32 numSampsPerChan, float64 timeout, bool32 fillMode, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved) {
-        int32 result = DAQmxBaseReadAnalogF64((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved);
+      int32 read_analog_f64(int32 numSampsPerChan, float64 timeout, bool32 fillMode, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead) {
+        int32 result = DAQmxBaseReadAnalogF64((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, NULL);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -949,8 +882,8 @@
 // DAQmxBaseReadBinaryI16(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, int16 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
 %ignore DAQmxBaseReadBinaryI16;
     %extend Task {
-      int32 read_binary_i16(int32 numSampsPerChan, float64 timeout, bool32 fillMode, int16 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved) {
-        int32 result = DAQmxBaseReadBinaryI16((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved);
+      int32 read_binary_i16(int32 numSampsPerChan, float64 timeout, bool32 fillMode, int16 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead) {
+        int32 result = DAQmxBaseReadBinaryI16((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, NULL);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -958,8 +891,8 @@
 // DAQmxBaseReadBinaryI32(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, int32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
 %ignore DAQmxBaseReadBinaryI32;
     %extend Task {
-      int32 read_binary_i32(int32 numSampsPerChan, float64 timeout, bool32 fillMode, int32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved) {
-        int32 result = DAQmxBaseReadBinaryI32((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved);
+      int32 read_binary_i32(int32 numSampsPerChan, float64 timeout, bool32 fillMode, int32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead) {
+        int32 result = DAQmxBaseReadBinaryI32((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, NULL);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -967,8 +900,8 @@
 // DAQmxBaseReadDigitalU8(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt8 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
 %ignore DAQmxBaseReadDigitalU8;
     %extend Task {
-      int32 read_digital_u8(int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt8 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved) {
-        int32 result = DAQmxBaseReadDigitalU8((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved);
+      int32 read_digital_u8(int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt8 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead) {
+        int32 result = DAQmxBaseReadDigitalU8((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, NULL);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -976,8 +909,8 @@
 // DAQmxBaseReadDigitalU32(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
 %ignore DAQmxBaseReadDigitalU32;
     %extend Task {
-      int32 read_digital_u32(int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved) {
-        int32 result = DAQmxBaseReadDigitalU32((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved);
+      int32 read_digital_u32(int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead) {
+        int32 result = DAQmxBaseReadDigitalU32((TaskHandle)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, NULL);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -985,8 +918,8 @@
 // DAQmxBaseReadDigitalScalarU32(TaskHandle taskHandle, float64 timeout, uInt32 *value, bool32 *reserved)
 %ignore DAQmxBaseReadDigitalScalarU32;
     %extend Task {
-      int32 read_digital_scalar_u32(float64 timeout, uInt32 *value, bool32 *reserved) {
-        int32 result = DAQmxBaseReadDigitalScalarU32((TaskHandle)$self, timeout, value, reserved);
+      int32 read_digital_scalar_u32(float64 timeout, uInt32 *value) {
+        int32 result = DAQmxBaseReadDigitalScalarU32((TaskHandle)$self, timeout, value, NULL);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -994,8 +927,8 @@
 // DAQmxBaseReadCounterF64(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
 %ignore DAQmxBaseReadCounterF64;
     %extend Task {
-      int32 read_counter_f64(int32 numSampsPerChan, float64 timeout, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved) {
-        int32 result = DAQmxBaseReadCounterF64((TaskHandle)$self, numSampsPerChan, timeout, readArray, arraySizeInSamps, sampsPerChanRead, reserved);
+      int32 read_counter_f64(int32 numSampsPerChan, float64 timeout, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead) {
+        int32 result = DAQmxBaseReadCounterF64((TaskHandle)$self, numSampsPerChan, timeout, readArray, arraySizeInSamps, sampsPerChanRead, NULL);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -1003,8 +936,8 @@
 // DAQmxBaseReadCounterU32(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
 %ignore DAQmxBaseReadCounterU32;
     %extend Task {
-      int32 read_counter_u32(int32 numSampsPerChan, float64 timeout, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved) {
-        int32 result = DAQmxBaseReadCounterU32((TaskHandle)$self, numSampsPerChan, timeout, readArray, arraySizeInSamps, sampsPerChanRead, reserved);
+      int32 read_counter_u32(int32 numSampsPerChan, float64 timeout, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead) {
+        int32 result = DAQmxBaseReadCounterU32((TaskHandle)$self, numSampsPerChan, timeout, readArray, arraySizeInSamps, sampsPerChanRead, NULL);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -1012,8 +945,8 @@
 // DAQmxBaseReadCounterScalarF64(TaskHandle taskHandle, float64 timeout, float64 *value, bool32 *reserved)
 %ignore DAQmxBaseReadCounterScalarF64;
     %extend Task {
-      int32 read_counter_scalar_f64(float64 timeout, float64 *value, bool32 *reserved) {
-        int32 result = DAQmxBaseReadCounterScalarF64((TaskHandle)$self, timeout, value, reserved);
+      int32 read_counter_scalar_f64(float64 timeout, float64 *value) {
+        int32 result = DAQmxBaseReadCounterScalarF64((TaskHandle)$self, timeout, value, NULL);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -1021,8 +954,8 @@
 // DAQmxBaseReadCounterScalarU32(TaskHandle taskHandle, float64 timeout, uInt32 *value, bool32 *reserved)
 %ignore DAQmxBaseReadCounterScalarU32;
     %extend Task {
-      int32 read_counter_scalar_u32(float64 timeout, uInt32 *value, bool32 *reserved) {
-        int32 result = DAQmxBaseReadCounterScalarU32((TaskHandle)$self, timeout, value, reserved);
+      int32 read_counter_scalar_u32(float64 timeout, uInt32 *value) {
+        int32 result = DAQmxBaseReadCounterScalarU32((TaskHandle)$self, timeout, value, NULL);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -1030,8 +963,8 @@
 // DAQmxBaseWriteAnalogF64(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, float64 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved)
 %ignore DAQmxBaseWriteAnalogF64;
     %extend Task {
-      int32 write_analog_f64(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, float64 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved) {
-        int32 result = DAQmxBaseWriteAnalogF64((TaskHandle)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved);
+      int32 write_analog_f64(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, float64 writeArray[], int32 *sampsPerChanWritten) {
+        int32 result = DAQmxBaseWriteAnalogF64((TaskHandle)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, NULL);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -1039,8 +972,8 @@
 // DAQmxBaseWriteDigitalU8(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt8 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved)
 %ignore DAQmxBaseWriteDigitalU8;
     %extend Task {
-      int32 write_digital_u8(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt8 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved) {
-        int32 result = DAQmxBaseWriteDigitalU8((TaskHandle)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved);
+      int32 write_digital_u8(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt8 writeArray[], int32 *sampsPerChanWritten) {
+        int32 result = DAQmxBaseWriteDigitalU8((TaskHandle)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, NULL);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -1048,8 +981,8 @@
 // DAQmxBaseWriteDigitalU32(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt32 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved)
 %ignore DAQmxBaseWriteDigitalU32;
     %extend Task {
-      int32 write_digital_u32(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt32 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved) {
-        int32 result = DAQmxBaseWriteDigitalU32((TaskHandle)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved);
+      int32 write_digital_u32(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt32 writeArray[], int32 *sampsPerChanWritten) {
+        int32 result = DAQmxBaseWriteDigitalU32((TaskHandle)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, NULL);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -1057,8 +990,8 @@
 // DAQmxBaseWriteDigitalScalarU32(TaskHandle taskHandle, bool32 autoStart, float64 timeout, uInt32 value, bool32 *reserved)
 %ignore DAQmxBaseWriteDigitalScalarU32;
     %extend Task {
-      int32 write_digital_scalar_u32(bool32 autoStart, float64 timeout, uInt32 value, bool32 *reserved) {
-        int32 result = DAQmxBaseWriteDigitalScalarU32((TaskHandle)$self, autoStart, timeout, value, reserved);
+      int32 write_digital_scalar_u32(bool32 autoStart, float64 timeout, uInt32 value) {
+        int32 result = DAQmxBaseWriteDigitalScalarU32((TaskHandle)$self, autoStart, timeout, value, NULL);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -1846,3 +1779,5 @@
 %rename("WARNING_DEVICE_MAY_SHUT_DOWN_DUE_TO_HIGH_TEMP") DAQmxWarningDeviceMayShutDownDueToHighTemp;
 %rename("WARNING_READ_NOT_COMPLETE_BEFORE_SAMP_CLK") DAQmxWarningReadNotCompleteBeforeSampClk;
 %rename("WARNING_WRITE_NOT_COMPLETE_BEFORE_SAMP_CLK") DAQmxWarningWriteNotCompleteBeforeSampClk;
+
+//  vim: filetype=swig ts=2 sw=2 et ai

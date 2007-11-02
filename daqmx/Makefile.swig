@@ -7,7 +7,7 @@ NI_DIR:=/Applications/National Instruments/NI-DAQmx Base
 NI_INC_DIR:=$(NI_DIR)/includes
 NI_HEADER:=/Applications/National\ Instruments/NI-DAQmx\ Base/includes/NIDAQmxBase.h
 
-SWIG_OPTS+=-v -ruby -Wall -w+322  -Fstandard
+SWIG_OPTS+=-v -ruby -Wall -w+322  -Fstandard -debug_typemap
 CPPFLAGS+=-I \"$(NI_INC_DIR)\"
 CFLAGS+=-g -Wall -Wno-redundant-decls
 LIBS=-framework nidaqmxbase -framework nidaqmxbaselv
@@ -21,6 +21,7 @@ BUNDLE=$(FEATURE).bundle
 DECLS=$(MODULE)_decls.i
  
 .PHONY: all install clean test debug
+.PRECIOUS: $(DECLS)
 
 all: $(BUNDLE)
 
