@@ -15,7 +15,8 @@
 // patch typo in header file
 #define  DAQmxReadBinaryI32  DAQmxBaseReadBinaryI32
 #include "NIDAQmxBase.h"
-extern  int32 handle_DAQmx_error(const char *funcName, int32 errCode);
+
+extern  int32 handle_DAQmx_error(int32 errCode);
 %}
 
 // patch typo in header file
@@ -31,14 +32,6 @@ extern  int32 handle_DAQmx_error(const char *funcName, int32 errCode);
 %apply  long *OUTPUT { int32 readArray[] };
 %apply  unsigned char *OUTPUT { uInt8 readArray[] };
 %apply  unsigned long *OUTPUT { uInt32 readArray[] };
-
-// TODO: handle error codes using exceptions
-// %exception
-//   or
-// %typemap(out) int32 {
-//     $result = ;
-// }
-
 
 %include "daqmxbase_decls.i"
 %include "NIDAQmxBase.h"

@@ -1,5 +1,6 @@
 // $Id$
 // Note that TaskHandle is typedef'd as uInt32*
+// so here &someTask is equivalent to a TaskHandle.
 %inline{
   typedef struct Task { uInt32 handle; } Task;
 };
@@ -25,9 +26,7 @@
     prefixLength = strlen(separator);
     errorBuffer = malloc(prefixLength + errorBufferSize);
     strcat(errorBuffer, separator);
-    int32 status = DAQmxBaseGetExtendedErrorInfo(errorBuffer + prefixLength,
-      (uInt32)errorBufferSize);
-
+    DAQmxBaseGetExtendedErrorInfo(errorBuffer + prefixLength, (uInt32)errorBufferSize);
     if (errCode < 0)
       rb_raise(rb_eRuntimeError, errorBuffer);
     else if (errCode > 0)
@@ -49,6 +48,24 @@
   $2 = (uInt32) RARRAY($input)->len;
 };
 
+%extend Task {
+  // if you give a non-empty name, you get LoadTask, else CreateTask.
+  Task(const char taskName[]) {
+    Task *t = (Task *)calloc(1, sizeof(Task));
+    int32 result;
+    if (&taskName[0] == NULL || taskName[0] == '\0')
+      result = DAQmxBaseCreateTask(taskName, (TaskHandle *)&t);
+    else
+      result = DAQmxBaseLoadTask(taskName, (TaskHandle *)&t);
+    if (result) handle_DAQmx_error(result);
+    return t;
+  }
+  ~Task() {
+    int32 result = DAQmxBaseStopTask((TaskHandle)$self);
+    result = DAQmxBaseClearTask((TaskHandle)$self);
+    free($self);
+  }
+};
 %rename("SELF_CAL_SUPPORTED") DAQmx_SelfCal_Supported;
 %rename("SELF_CAL_LAST_TEMP") DAQmx_SelfCal_LastTemp;
 %rename("EXT_CAL_RECOMMENDED_INTERVAL") DAQmx_ExtCal_RecommendedInterval;
@@ -725,8 +742,8 @@
 // DAQmxBaseCreateTask(const char taskName[], TaskHandle *taskHandle)
 %ignore DAQmxBaseCreateTask;
     %inline {
-      int32 create_task(const char taskName[], Task *taskHandle) {
-        int32 result = DAQmxBaseCreateTask(taskName, (TaskHandle *)taskHandle);
+      int32 create_task(const char taskName[], TaskHandle *taskHandle) {
+        int32 result = DAQmxBaseCreateTask(taskName, taskHandle);
         if (result) handle_DAQmx_error(result);
         return result;
       }
@@ -734,7 +751,7 @@
 // DAQmxBaseStartTask(TaskHandle taskHandle)
 %ignore DAQmxBaseStartTask;
     %extend Task {
-      int32 start_task() {
+      int32 start() {
         int32 result = DAQmxBaseStartTask((TaskHandle)$self);
         if (result) handle_DAQmx_error(result);
         return result;
@@ -743,7 +760,7 @@
 // DAQmxBaseStopTask(TaskHandle taskHandle)
 %ignore DAQmxBaseStopTask;
     %extend Task {
-      int32 stop_task() {
+      int32 stop() {
         int32 result = DAQmxBaseStopTask((TaskHandle)$self);
         if (result) handle_DAQmx_error(result);
         return result;
@@ -752,7 +769,7 @@
 // DAQmxBaseClearTask(TaskHandle taskHandle)
 %ignore DAQmxBaseClearTask;
     %extend Task {
-      int32 clear_task() {
+      int32 clear() {
         int32 result = DAQmxBaseClearTask((TaskHandle)$self);
         if (result) handle_DAQmx_error(result);
         return result;

@@ -20,26 +20,19 @@ def testOne
   samples_per_chan = 1
   data = nil
   points_read = nil
+  errCode = 0
 
-  task = Daqmxbase::Task.new
-
-  errCode = Daqmxbase::create_task("", task)
-  printOne("create task", errCode,  "task=#{task.inspect}")
+  task = Daqmxbase::Task.new("")
+  printOne("create task", errCode, "task=#{task.inspect}, handle=#{task.handle}")
 
   errCode = task.create_aivoltage_chan("Dev1/ai0","",Daqmxbase::VAL_CFG_DEFAULT,-10.0,10.0,Daqmxbase::VAL_VOLTS,"")
   printOne("create aivoltage channel", errCode)
 
-  errCode = task.start_task()
+  errCode = task.start()
   printOne("start task", errCode)
 
   (err_code, data, points_read) = task.read_analog_f64(points_to_read, timeout, Daqmxbase::VAL_GROUP_BY_CHANNEL, samples_per_chan)
   printOne("read", errCode, "data=#{data.inspect}, points_read=#{points_read.inspect}")
-
-  errCode = task.stop_task()
-  printOne("stop task", errCode)
-
-  errCode = task.clear_task()
-  printOne("clear tast", errCode)
 end
 
 testOne()
