@@ -41,40 +41,50 @@
 #    Call Stop function at the end.
 #
 
+BEGIN { $stderr.reopen("/dev/null") }
+
 require 'daqmxbase'
 
 # Task parameters
 task = nil
 
 # Channel parameters
-chan = "Dev1/ai0"
+chan = "Dev1/ai0:7"
 nameToAssignToChannel = ""
 terminalConfig = Daqmxbase::VAL_CFG_DEFAULT
-min = -10.0
-max = 10.0
+min = -2.0
+max = 2.0
 units = Daqmxbase::VAL_VOLTS
 customScaleName = ""
 
 # Timing parameters
 source = "OnboardClock"
-sampleRate = 10000.0
+sampleRate = 10.0
 activeEdge = Daqmxbase::VAL_RISING
 sampleMode = Daqmxbase::VAL_FINITE_SAMPS
-samplesPerChan = 1000
+samplesPerChan = 10
 
 # Data read parameters
-numSampsPerChan = Daqmxbase::VAL_CFG_DEFAULT # will wait and then acquire
-timeout = 10.0
+# numSampsPerChan = Daqmxbase::VAL_CFG_DEFAULT # will wait and then acquire
+numSampsPerChan = 100
+timeout = 0.8
 fillMode = Daqmxbase::VAL_GROUP_BY_CHANNEL # or Daqmxbase::VAL_GROUP_BY_SCAN_NUMBER
-bufferSize = 1000
+bufferSize = 800
 
-task = Daqmxbase::Task.new(nil)
-task.create_aivoltage_chan(chan, nameToAssignToChannel, terminalConfig, min, max, units, customScaleName) 
-task.cfg_samp_clk_timing(source, sampleRate, activeEdge, sampleMode, samplesPerChan)
-task.start()
+begin
+  task = Daqmxbase::Task.new(nil)
+  task.create_aivoltage_chan(chan, nameToAssignToChannel, terminalConfig, min, max, units, customScaleName) 
+  task.cfg_samp_clk_timing(source, sampleRate, activeEdge, sampleMode, samplesPerChan)
+  task.start()
 
-(errorCode, data, sampsPerChanRead) = task.read_analog_f64(numSampsPerChan, timeout, fillMode, bufferSize)
-puts "Acquired #{pointsRead} samples"
-
-# Just print out the first 10 points
-puts data[0,10].inspect_string
+  startTime = Time.now
+  # (errorCode, data, sampsPerChanRead)
+  stuff = task.read_analog_f64(numSampsPerChan, timeout, fillMode, bufferSize)
+  endTime = Time.now
+rescue  Exception => e
+  $stderr.reopen($stdout)
+  $stderr.puts e.message
+end
+samplesPerChanRead = stuff.pop
+p stuff
+puts "read #{samplesPerChanRead}, total time: #{endTime - startTime}, rate: #{samplesPerChanRead/(endTime-startTime)}"
