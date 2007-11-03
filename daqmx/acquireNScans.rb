@@ -79,12 +79,13 @@ begin
 
   startTime = Time.now
   # (errorCode, data, sampsPerChanRead)
-  stuff = task.read_analog_f64(numSampsPerChan, timeout, fillMode, bufferSize)
+  (errorCode, data, samplesPerChanRead) = task.read_analog_f64(numSampsPerChan, timeout, fillMode, bufferSize)
   endTime = Time.now
 rescue  Exception => e
   $stderr.reopen($stdout)
   $stderr.puts e.message
+else
+  p data
+  p samplesPerChanRead
+  puts "read #{samplesPerChanRead}, total time: #{endTime - startTime}, rate: #{samplesPerChanRead/(endTime-startTime)}"
 end
-samplesPerChanRead = stuff.pop
-p stuff
-puts "read #{samplesPerChanRead}, total time: #{endTime - startTime}, rate: #{samplesPerChanRead/(endTime-startTime)}"

@@ -93,6 +93,7 @@ int32 handle_DAQmx_error(int32 errCode)
 // make Ruby Array of FIXNUM
 %typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps) {
   long i;
+  VALUE data;
   // result is return val from function
   if (result != 0)
   {
@@ -102,13 +103,17 @@ int32 handle_DAQmx_error(int32 errCode)
   }
 
   // create Ruby array of given length
-  $result = rb_ary_new2($2);
+  data = rb_ary_new2($2);
 
   // populate it an element at a time.
   for (i = 0; i < (long)$2; i++)
-    rb_ary_store($result, i, rb_float_new($1[i]));
+    rb_ary_store(data, i, rb_float_new($1[i]));
 
   // $result is what will be passed to Ruby
+  if (rb_type($result) == T_ARRAY)
+    rb_ary_push($result, data); // either append
+  else
+    $result = data;             // or blow it away
 };
 
 // Note that TaskHandle is typedef'd as uInt32*
