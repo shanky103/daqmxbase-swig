@@ -70,7 +70,7 @@ int32 handle_DAQmx_error(int32 errCode)
 %apply  unsigned long *OUTPUT { uInt32 *value };
 
 // ruby size param in: alloc array of given size
-%typemap(in) (int16 readArray[], uInt32 arraySizeInSamps) {
+%typemap(in) (float64 readArray[], uInt32 arraySizeInSamps) {
   long len;
 
   if (FIXNUM_P($input))
@@ -81,17 +81,17 @@ int32 handle_DAQmx_error(int32 errCode)
   if (len <= 0)
     rb_raise(rb_eRangeError, "readArray size must be > 0 (but got %ld)", len);
 
-  $1 = calloc((size_t)len, sizeof(int16));
+  $1 = calloc((size_t)len, sizeof(float64));
   $2 = (uInt32)len;
 };
 
 // free array allocated by above
-%typemap(freearg) (int16 readArray[], uInt32 arraySizeInSamps) {
+%typemap(freearg) (float64 readArray[], uInt32 arraySizeInSamps) {
   if ($1) free($1);
 };
 
 // make Ruby Array of FIXNUM
-%typemap(argout) (int16 readArray[], uInt32 arraySizeInSamps) {
+%typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps) {
   long i;
   // result is return val from function
   if (result != 0)
@@ -106,7 +106,7 @@ int32 handle_DAQmx_error(int32 errCode)
 
   // populate it an element at a time.
   for (i = 0; i < (long)$2; i++)
-    rb_ary_store($result, i, LONG2FIX($1[i]));
+    rb_ary_store($result, i, rb_float_new($1[i]));
 
   // $result is what will be passed to Ruby
 };

@@ -73,7 +73,7 @@ task.create_aivoltage_chan(chan, nameToAssignToChannel, terminalConfig, min, max
 task.cfg_samp_clk_timing(source, sampleRate, activeEdge, sampleMode, samplesPerChan)
 task.start()
 
-(errorCode, data, sampsPerChanRead) = task.read_binary_i16(numSampsPerChan, timeout, fillMode, bufferSize)
+(errorCode, data, sampsPerChanRead) = task.read_analog_f64(numSampsPerChan, timeout, fillMode, bufferSize)
 puts "Acquired #{pointsRead} samples"
 
 # Just print out the first 10 points
