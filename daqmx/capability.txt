@@ -1,0 +1,17 @@
+NI USB-6008/9
+  *Supported in NI-DAQmx Base Task Configuration Utility
+  *Analog Input
+    -Digital start triggering
+    -Multi-channel, multi-sample read (scaled)
+    -Multi-channel, single sample read (scaled)
+  *Analog Output
+    -Multi-channel, multi-sample write (scaled)
+    -Multi-channel, single-sample write (scaled)
+  *Counter Input
+    -Simple event counting (falling edge only)
+  *Digital I/O
+    -Line input
+    -Port input
+    -Port output
+    -Line output
+
