@@ -52,14 +52,8 @@ now = Time.now
 
 (errorCode, data, sampsPerChanRead) = task.read_analog_f64(numSampsPerChan, timeout, fillMode, arraySizeInSamps) 
 
-while !task.is_task_done()
-  puts("sleep 1, pointsRead = #{pointsRead}")
-  sleep(1)
-end
-
 puts("elapsed: #{Time.now - now} seconds")
-
-printf("Acquired %d samples\n", pointsRead)
+printf("Acquired %d samples\n", sampsPerChanRead)
 
 # Just print out the first 10 points
-10.times_repeat { |i| printf("data[%d] = %f\n", i, data[i]) }
+10.times { |i| printf("data[%d] = %f\n", i, data[i]) }

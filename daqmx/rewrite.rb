@@ -2,7 +2,11 @@
 # rewrite NIDAQmxBase.h for SWIG
 
 BEGIN {
-  $ignored = %w{ DAQmxBaseReadBinaryI16 DAQmxBaseReadBinaryI32 DAQmxBaseReadDigitalU8 DAQmxBaseReadDigitalU32 DAQmxBaseReadCounterF64 DAQmxBaseReadCounterU32 }
+  $ignored = %w{
+    DAQmxBaseReadBinaryI16 DAQmxBaseReadBinaryI32
+    DAQmxBaseReadDigitalU8 DAQmxBaseReadDigitalU32
+    DAQmxBaseReadCounterF64 DAQmxBaseReadCounterU32
+    }
 }
 
 ARGF.each_line do |line|

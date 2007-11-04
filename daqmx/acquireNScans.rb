@@ -51,7 +51,10 @@ task = nil
 # Channel parameters
 chan = "Dev1/ai0:7"
 nameToAssignToChannel = ""
-terminalConfig = Daqmxbase::VAL_CFG_DEFAULT
+# differential:
+# terminalConfig = Daqmxbase::VAL_CFG_DEFAULT
+# single-ended: 
+terminalConfig = Daqmxbase::VAL_RSE
 min = -2.0
 max = 2.0
 units = Daqmxbase::VAL_VOLTS

@@ -3,10 +3,13 @@ NI USB-6008/9
   *Analog Input
     -Digital start triggering
     -Multi-channel, multi-sample read (scaled)
+      ai/acquireNScans
     -Multi-channel, single sample read (scaled)
+      ai/acquire1Scan
   *Analog Output
     -Multi-channel, multi-sample write (scaled)
     -Multi-channel, single-sample write (scaled)
+      ao/voltageUpdate
   *Counter Input
     -Simple event counting (falling edge only)
   *Digital I/O

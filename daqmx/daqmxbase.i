@@ -69,6 +69,60 @@ int32 handle_DAQmx_error(int32 errCode)
 %apply  float *OUTPUT { float64 *value };
 %apply  unsigned long *OUTPUT { uInt32 *value };
 
+%typemap(in) (float64 writeArray[]) {
+  long len = 1;
+  long i;
+  float64 val;
+  $1 = calloc(len, sizeof(float64));
+
+  switch (rb_type($input))
+  {
+    case T_ARRAY:
+      len = RARRAY($input)->len;
+      $1 = realloc($1, sizeof(float64)*(size_t)len);
+      for (i = 0; i < len; i++)
+      {
+        VALUE v;
+        v = rb_ary_entry($input, i);
+        switch (rb_type(v))
+        {
+          case T_FIXNUM:
+            val = (float64)FIX2LONG(v);
+            break;
+
+          case T_FLOAT:
+            val = (float64)RFLOAT(v)->value;
+            break;
+
+          default:
+            goto Error;
+        };
+        $1[i] = val;
+      }
+      break;
+
+    case T_FIXNUM:
+      val = (float64)FIX2LONG($input);
+      break;
+
+    case T_FLOAT:
+      val = (float64)RFLOAT($input)->value;
+      break;
+
+Error:
+    default:
+      free($1);
+      $1 = NULL;
+      rb_raise(rb_eTypeError, "writeArray must be FIXNUM, float, or array of float or fixnum");
+      break;
+  };
+};
+
+// free array allocated by above
+%typemap(freearg) (float64 writeArray[]) {
+  if ($1) free($1);
+};
+
 // ruby size param in: alloc array of given size
 %typemap(in) (float64 readArray[], uInt32 arraySizeInSamps) {
   long len;
