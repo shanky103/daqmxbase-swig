@@ -110,10 +110,17 @@ int32 handle_DAQmx_error(int32 errCode)
     rb_ary_store(data, i, rb_float_new($1[i]));
 
   // $result is what will be passed to Ruby
-  if (rb_type($result) == T_ARRAY)
-    rb_ary_push($result, data); // either append
-  else
-    $result = data;             // or blow it away
+  if (rb_type($result) != T_ARRAY)
+  {
+    if ($result != Qnil)
+    {
+      VALUE oldResult = $result;
+      $result = rb_ary_new();
+      rb_ary_push($result, oldResult);
+    }
+  }
+
+  rb_ary_push($result, data);
 };
 
 // Note that TaskHandle is typedef'd as uInt32*

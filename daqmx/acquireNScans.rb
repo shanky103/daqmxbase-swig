@@ -65,9 +65,9 @@ sampleMode = Daqmxbase::VAL_FINITE_SAMPS
 samplesPerChan = 10
 
 # Data read parameters
-# numSampsPerChan = Daqmxbase::VAL_CFG_DEFAULT # will wait and then acquire
-numSampsPerChan = 100
-timeout = 0.8
+# numSamplsPerChan = Daqmxbase::VAL_CFG_DEFAULT # will wait and then acquire
+numSamplesPerChan = 100
+timeout = 10.0
 fillMode = Daqmxbase::VAL_GROUP_BY_CHANNEL # or Daqmxbase::VAL_GROUP_BY_SCAN_NUMBER
 bufferSize = 800
 
@@ -78,14 +78,13 @@ begin
   task.start()
 
   startTime = Time.now
-  # (errorCode, data, sampsPerChanRead)
-  (errorCode, data, samplesPerChanRead) = task.read_analog_f64(numSampsPerChan, timeout, fillMode, bufferSize)
+  (errorCode, data, samplesPerChanRead) = task.read_analog_f64(numSamplesPerChan, timeout, fillMode, bufferSize)
   endTime = Time.now
 rescue  Exception => e
   $stderr.reopen($stdout)
   $stderr.puts e.message
 else
+  $stderr.reopen($stdout)
   p data
-  p samplesPerChanRead
-  puts "read #{samplesPerChanRead}, total time: #{endTime - startTime}, rate: #{samplesPerChanRead/(endTime-startTime)}"
+  $stdout.puts "error #{errorCode}, read #{samplesPerChanRead}, total time: #{endTime - startTime}, rate: #{samplesPerChanRead/(endTime-startTime)}"
 end
