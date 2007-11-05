@@ -22,17 +22,35 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 # License for the specific language governing permissions and limitations under
 # the License.
-#
-SWIG=/opt/local/bin/swig
-RUBY=/opt/local/bin/ruby
 
-NI_DIR:=/Applications/National Instruments/NI-DAQmx Base
-NI_INC_DIR:=$(NI_DIR)/includes
-NI_HEADER:=/Applications/National\ Instruments/NI-DAQmx\ Base/includes/NIDAQmxBase.h
+SWIG?=swig
+RUBY?=ruby
+
+OSTYPE?=$(shell uname -o)
+
+ifeq ($(OSTYPE),darwin)
+NI_DIR?=/Applications/National Instruments/NI-DAQmx Base
+NI_INC_DIR=$(NI_DIR)/includes
+else ifeq ($(OS),Windows_NT)
+ifeq ($(OSTYPE),Cygwin)
+NI_DIR?=$(shell cygpath -u "$(PROGRAMFILES)/National Instruments/NI-DAQmx Base")
+else
+NI_DIR?=$(PROGRAMFILES)/National Instruments/NI-DAQmx Base
+endif
+NI_DIR:=$(subst /\,,$(subst :\,:/,$(patsubst %\,%/,$(NI_DIR))))
+NI_INC_DIR=$(NI_DIR)/Include
+else
+endif
+
+# quote spaces
+NI_DIR:=$(subst /\,,$(patsubst %,%\,$(NI_DIR)/))
+SPACE= #space here
+
+NI_HEADER:=$(subst :/,:\,$(NI_INC_DIR)/NIDAQmxBase.h)
 
 # -debug_typemap -Wall -w322
 SWIG_OPTS+=-ruby -Fstandard 
-CPPFLAGS+=-I \"$(NI_INC_DIR)\"
+CPPFLAGS+=-I $(NI_INC_DIR)
 CFLAGS+=-g -Wall -Wno-redundant-decls
 LIBS=-framework nidaqmxbase -framework nidaqmxbaselv
 
@@ -41,32 +59,31 @@ FEATURE=Daqmxbase
 
 INTERFACE=$(MODULE).i
 WRAPPER=$(MODULE)_wrap.c
-BUNDLE=$(FEATURE).bundle
 DECLS=$(MODULE)_decls.i
  
-.PHONY: all install clean test debug
+.PHONY: all install clean test debug dll
 .PRECIOUS: $(DECLS)
 
-all: $(BUNDLE)
+all: dll
 
-$(BUNDLE): Makefile
-	make $@
+dll: Makefile
+	$(MAKE) all
 
 install: Makefile
-	make install
+	$(MAKE) install
 
 Makefile: $(WRAPPER) extconf.rb
 	$(RUBY) -r mkmf extconf.rb
 
 $(WRAPPER): $(DECLS) $(INTERFACE)
-	$(SWIG) $(SWIG_OPTS) "-I$(NI_INC_DIR)" -o $@ $(INTERFACE)
+	$(SWIG) $(SWIG_OPTS) -I$(NI_INC_DIR) -o $@ $(INTERFACE)
 
 $(DECLS): rewrite.rb $(NI_HEADER)
 	ruby rewrite.rb $(NI_HEADER) > $@
 
 extconf.rb: $(MAKEFILE_LIST)
 	echo 'require "mkmf"' > $@
-	echo '$$CPPFLAGS<<" $(CPPFLAGS) "' >> $@
+	echo '$$CPPFLAGS<<" -I \"$(NI_INC_DIR)\" "' >> $@
 	echo '$$CFLAGS<<" $(CFLAGS) "' >> $@
 	echo '$$LDFLAGS<<" $(LDFLAGS) "' >> $@
 	echo '$$LIBS<<" $(LIBS) "' >> $@
@@ -74,7 +91,7 @@ extconf.rb: $(MAKEFILE_LIST)
 
 clean:
 	@if [ -f Makefile ] ; then\
-		make -f Makefile clean;\
+		$(MAKE) -f Makefile clean;\
 	fi
 	rm -f Makefile $(WRAPPER)
 	rm -f extconf.rb .gdbinit
