@@ -27,6 +27,7 @@ SWIG?=swig
 # TODO: how to find for WinNT distro?
 SWIGLIB?=$(shell $(SWIG) -swiglib)
 RUBY?=ruby
+CYGWIN_VIM?=no
 
 # for .vimrc:
 RUBYPATH?=$(shell ruby -e 'print $$:.join(",")')
@@ -38,18 +39,21 @@ ifeq ($(OSTYPE),darwin)
 NI_DIR?=/Applications/National Instruments/NI-DAQmx Base
 NI_INC_DIR=$(NI_DIR)/includes
 else ifeq ($(OS),Windows_NT)
+NI_WIN_DIR?=$(PROGRAMFILES)/National Instruments/NI-DAQmx Base
 ifeq ($(OSTYPE),Cygwin)
-NI_DIR?=$(shell cygpath -u "$(PROGRAMFILES)/National Instruments/NI-DAQmx Base")
+NI_DIR?=$(shell cygpath -u "$(NI_WIN_DIR)")
 else
-NI_DIR?=$(PROGRAMFILES)/National Instruments/NI-DAQmx Base
+NI_DIR?=$(NI_WIN_DIR)
 endif
 NI_DIR:=$(subst /\,,$(subst :\,:/,$(patsubst %\,%/,$(NI_DIR))))
 NI_INC_DIR=$(NI_DIR)/Include
+NI_WIN_INC_DIR=$(NI_WIN_DIR)/Include
 else
 endif
 
 # quote spaces
 NI_DIR:=$(subst /\,,$(patsubst %,%\,$(NI_DIR)/))
+NI_WIN_INC_DIR:=$(subst :\,:/,$(subst /\,,$(patsubst %,%\,$(NI_WIN_INC_DIR)/)))
 SPACE= #space here
 
 NI_HEADER:=$(subst :/,:\,$(NI_INC_DIR)/NIDAQmxBase.h)
@@ -62,7 +66,7 @@ LIBS=-framework nidaqmxbase -framework nidaqmxbaselv
 
 MODULE=daqmxbase
 FEATURE=Daqmxbase
-
+SPACE= #space
 INTERFACE=$(MODULE).i
 WRAPPER=$(MODULE)_wrap.c
 DECLS=$(MODULE)_decls.i
@@ -73,7 +77,11 @@ DECLS=$(MODULE)_decls.i
 all: dll .vimrc
 
 .vimrc: $(MAKEFILE_LIST)
+ifeq ($(CYGWIN_VIM),no)
+	echo  >$@ 'set path+=$(subst \ ,\\ ,$(subst \,\\,$(NI_WIN_INC_DIR)))'
+else
 	echo  >$@ 'set path+=$(subst \,\\\,$(NI_INC_DIR))'
+endif
 	echo >>$@ 'set path+=$(RUBYPATH)'
 	echo >>$@ 'set path+=$(SWIGPATH)'
 	echo >>$@ 'set makeprg=make\ -f\ Makefile.swig'

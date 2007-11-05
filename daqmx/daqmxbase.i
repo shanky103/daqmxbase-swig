@@ -197,7 +197,7 @@ Error:
 // Note that TaskHandle is typedef'd as uInt32*
 // so here &someTask is equivalent to a TaskHandle.
 %inline{
-  typedef struct Task { uInt32 handle; } Task;
+  typedef struct { uInt32 t; } Task;
 };
 
 // pass string and size to C function
@@ -224,15 +224,15 @@ Error:
     Task *t = (Task *)calloc(1, sizeof(Task));
     int32 result;
     if (&taskName[0] == NULL || taskName[0] == '\0')
-      result = DAQmxBaseCreateTask(taskName, (TaskHandle *)&t);
+      result = DAQmxBaseCreateTask(taskName, (TaskHandle *)(void *)&t);
     else
-      result = DAQmxBaseLoadTask(taskName, (TaskHandle *)&t);
+      result = DAQmxBaseLoadTask(taskName, (TaskHandle *)(void *)&t);
     if (result) handle_DAQmx_error(result);
     return t;
   }
   ~Task() {
-    int32 result = DAQmxBaseStopTask((TaskHandle)$self);
-    result = DAQmxBaseClearTask((TaskHandle)$self);
+    int32 result = DAQmxBaseStopTask((TaskHandle)(void *)$self);
+    result = DAQmxBaseClearTask((TaskHandle)(void *)$self);
     free($self);
   }
 };
