@@ -53,11 +53,11 @@ ARGF.each_line do |line|
   line.sub(/^int32\s+DllExport\s+__CFUNC\s+(DAQmxBase_?)([_[:alnum:]]+)\s*\((.*)\)\s*;\s*$/) do |m|
     prefix = $1
     suffix = $2
+    libname = prefix + suffix
     args = $3.gsub(/\s+/,' ').split(/\s*,\s*/)
-    puts "// #{prefix + suffix}(#{args.join(", ")})"
+    puts "// extern int32 #{libname}(#{args.join(", ")});"
     hasSelf = (args[0] == "TaskHandle taskHandle")
     args.shift if hasSelf
-    libname = prefix + suffix
 
     rubyname = suffix.gsub(/([a-z])([A-Z])/, '\1_\2').downcase
 
@@ -73,9 +73,9 @@ ARGF.each_line do |line|
 
     if hasSelf
       puts <<EOF
-%rename(\"Task_#{rubyname}\") #{libname};
 %extend Task {
-//  int32 #{rubyname}(#{args.join(", ")});
+  %rename(\"#{rubyname}\") #{libname};
+  int32 #{rubyname}(#{args.join(", ")});
 };
 EOF
     else

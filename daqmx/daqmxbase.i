@@ -238,6 +238,6 @@ Error:
 };
 
 %include "daqmxbase_decls.i"
-%include "NIDAQmxBase.h"
+%import "NIDAQmxBase.h"
 
 //  vim: filetype=swig ts=2 sw=2 et ai

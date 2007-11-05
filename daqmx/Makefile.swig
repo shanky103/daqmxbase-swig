@@ -38,9 +38,14 @@ OSTYPE?=$(shell uname -o)
 ifeq ($(OSTYPE),darwin)
 NI_DIR?=/Applications/National Instruments/NI-DAQmx Base
 NI_INC_DIR=$(NI_DIR)/includes
+LIBS+= -framework nidaqmxbase -framework nidaqmxbaselv
 else ifeq ($(OS),Windows_NT)
 NI_WIN_DIR?=$(PROGRAMFILES)/National Instruments/NI-DAQmx Base
 NI_WIN_INC_DIR?=$(NI_WIN_DIR)/Include
+LDFLAGS+= -Wl,-L\"$(NI_DIR)/Lib\" '-Wl,--dll-search-prefix='
+LIBS+= -lnidaqmxbase
+CPPFLAGS+= -DWIN32
+CFLAGS+= -mno-cygwin -Wl,--add-stdcall-alias
 ifeq ($(OSTYPE),Cygwin)
 NI_DIR?=$(shell cygpath -u "$(NI_WIN_DIR)")
 else
@@ -59,10 +64,9 @@ SPACE= #space here
 NI_HEADER:=$(subst :/,:\,$(NI_INC_DIR)/NIDAQmxBase.h)
 
 # -debug_typemap -Wall -w322
-SWIG_OPTS+=-ruby -Fstandard 
-CPPFLAGS+=-I $(NI_INC_DIR)
-CFLAGS+=-g -Wall -Wno-redundant-decls
-LIBS=-framework nidaqmxbase -framework nidaqmxbaselv
+SWIG_OPTS+= -v -ruby -Fstandard  -dump_typedef -dump_classes
+CPPFLAGS+= -I \"$(NI_INC_DIR)\"
+CFLAGS+= -g -Wall -Wno-redundant-decls
 
 MODULE=daqmxbase
 FEATURE=Daqmxbase
@@ -107,7 +111,7 @@ $(DECLS): rewrite.rb $(NI_HEADER)
 
 extconf.rb: $(MAKEFILE_LIST)
 	echo 'require "mkmf"' > $@
-	echo '$$CPPFLAGS<<" -I \"$(NI_INC_DIR)\" "' >> $@
+	echo '$$CPPFLAGS<<" $(CPPFLAGS) "' >> $@
 	echo '$$CFLAGS<<" $(CFLAGS) "' >> $@
 	echo '$$LDFLAGS<<" $(LDFLAGS) "' >> $@
 	echo '$$LIBS<<" $(LIBS) "' >> $@
