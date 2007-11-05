@@ -24,7 +24,13 @@
 # the License.
 
 SWIG?=swig
+# TODO: how to find for WinNT distro?
+SWIGLIB?=$(shell $(SWIG) -swiglib)
 RUBY?=ruby
+
+# for .vimrc:
+RUBYPATH?=$(shell ruby -e 'print $$:.join(",")')
+SWIGPATH?=$(SWIGLIB)/ruby,$(SWIGLIB)
 
 OSTYPE?=$(shell uname -o)
 
@@ -62,9 +68,19 @@ WRAPPER=$(MODULE)_wrap.c
 DECLS=$(MODULE)_decls.i
  
 .PHONY: all install clean test debug dll
-.PRECIOUS: $(DECLS)
+.PRECIOUS: $(DECLS) .vimrc
 
-all: dll
+all: dll .vimrc
+
+.vimrc: $(MAKEFILE_LIST)
+	echo  >$@ 'set path+=$(subst \,\\\,$(NI_INC_DIR))'
+	echo >>$@ 'set path+=$(RUBYPATH)'
+	echo >>$@ 'set path+=$(SWIGPATH)'
+	echo >>$@ 'set makeprg=make\ -f\ Makefile.swig'
+	echo >>$@ 'set isfname+=\ '
+	echo >>$@ 'set errorformat^=%f:%l:\ %m'
+	echo >>$@ 'au BufNewFile,BufRead Makefile* setf make'
+	echo >>$@ 'au BufNewFile,BufRead *.i setf swig'
 
 dll: Makefile
 	$(MAKE) all
