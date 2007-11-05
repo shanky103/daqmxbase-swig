@@ -38,10 +38,10 @@ BEGIN {
 
 ARGF.each_line do |line|
   line.chomp!
-  line.gsub!(/[[:blank:]]+/, ' ')
+  line.gsub!(/\s+/, ' ')
 
   # Constants
-  line.sub(/^#define[[:blank:]]+(DAQmx_?)([_[:alnum:]]+)[[:blank:]].*/) { |m|
+  line.sub(/^#define\s+(DAQmx_?)([_[:alnum:]]+)\s.*/) { |m|
     prefix = $1
     suffix = $2
     rubyname = suffix.gsub(/([a-z])([A-Z])/, '\1_\2').upcase
@@ -50,10 +50,10 @@ ARGF.each_line do |line|
   }
 
   # Functions
-  line.sub(/^int32[[:blank:]]+DllExport[[:blank:]]+__CFUNC[[:blank:]]+(DAQmxBase_?)([_[:alnum:]]+)[[:blank:]]*\((.*)\)[[:blank:]]*;[[:blank:]]*$/) do |m|
+  line.sub(/^int32\s+DllExport\s+__CFUNC\s+(DAQmxBase_?)([_[:alnum:]]+)\s*\((.*)\)\s*;\s*$/) do |m|
     prefix = $1
     suffix = $2
-    args = $3.gsub(/  */,' ').split(/ *, */)
+    args = $3.gsub(/\s+/,' ').split(/\s*,\s*/)
     puts "// #{prefix + suffix}(#{args.join(", ")})"
     hasSelf = (args[0] == "TaskHandle taskHandle")
     args.shift if hasSelf
