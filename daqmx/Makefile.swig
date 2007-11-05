@@ -40,6 +40,7 @@ NI_DIR?=/Applications/National Instruments/NI-DAQmx Base
 NI_INC_DIR=$(NI_DIR)/includes
 else ifeq ($(OS),Windows_NT)
 NI_WIN_DIR?=$(PROGRAMFILES)/National Instruments/NI-DAQmx Base
+NI_WIN_INC_DIR?=$(NI_WIN_DIR)/Include
 ifeq ($(OSTYPE),Cygwin)
 NI_DIR?=$(shell cygpath -u "$(NI_WIN_DIR)")
 else
@@ -47,7 +48,6 @@ NI_DIR?=$(NI_WIN_DIR)
 endif
 NI_DIR:=$(subst /\,,$(subst :\,:/,$(patsubst %\,%/,$(NI_DIR))))
 NI_INC_DIR=$(NI_DIR)/Include
-NI_WIN_INC_DIR=$(NI_WIN_DIR)/Include
 else
 endif
 

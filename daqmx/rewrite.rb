@@ -37,10 +37,11 @@ BEGIN {
 }
 
 ARGF.each_line do |line|
+  line.chomp!
   line.gsub!(/[[:blank:]]+/, ' ')
 
   # Constants
-  line.sub(/^#define (DAQmx_?)([_[:alnum:]]+) .*/) { |m|
+  line.sub(/^#define[[:blank:]]+(DAQmx_?)([_[:alnum:]]+)[[:blank:]].*/) { |m|
     prefix = $1
     suffix = $2
     rubyname = suffix.gsub(/([a-z])([A-Z])/, '\1_\2').upcase
@@ -49,7 +50,7 @@ ARGF.each_line do |line|
   }
 
   # Functions
-  line.sub(/^int32 DllExport __CFUNC (DAQmxBase_?)([_[:alnum:]]+) *\((.*)\) *; *$/) do |m|
+  line.sub(/^int32[[:blank:]]+DllExport[[:blank:]]+__CFUNC[[:blank:]]+(DAQmxBase_?)([_[:alnum:]]+)[[:blank:]]*\((.*)\)[[:blank:]]*;[[:blank:]]*$/) do |m|
     prefix = $1
     suffix = $2
     args = $3.gsub(/  */,' ').split(/ *, */)
@@ -65,13 +66,16 @@ ARGF.each_line do |line|
     end
 
     # if we haven't figured out how to handle it yet, just skip it
-    next if $ignored.include?(libname)
+    if $ignored.include?(libname)
+      puts "%ignore #{libname};"
+      next
+    end
 
     if hasSelf
       puts <<EOF
 %rename(\"Task_#{rubyname}\") #{libname};
 %extend Task {
-  int32 #{rubyname}(#{args.join(", ")});
+//  int32 #{rubyname}(#{args.join(", ")});
 };
 EOF
     else
