@@ -1,7 +1,24 @@
+// $Id$
 // SWIG (http://www.swig.org) definitions for
 // National Instruments NI-DAQmx Base
-// Ned Konz, November 1 2007
-// $Id$
+
+// ruby-daqmxbase: A SWIG interface for Ruby and the NI-DAQmx Base data
+// acquisition library.
+// 
+// Copyright (C) 2007 Ned Konz
+// 
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not
+// use this file except in compliance with the License.  You may obtain a copy
+// of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+// License for the specific language governing permissions and limitations
+// under the License.
+//
 
 // Will be Ruby module named Daqmxbase
 %module  daqmxbase
@@ -16,7 +33,7 @@
 #include <stdlib.h>
 #include "ruby.h"
 
-// patch typo in header file
+// patch typo in v2.20f header file
 #define  DAQmxReadBinaryI32  DAQmxBaseReadBinaryI32
 #include "NIDAQmxBase.h"
 
@@ -187,6 +204,18 @@ Error:
 %typemap(in) (char *str, int len) {
   $1 = STR2CSTR($input);
   $2 = (int) RSTRING($input)->len;
+};
+
+// pass error code return from DAQmxBase functions to Ruby
+%typemap(out) int32 {
+  if ($1) handle_DAQmx_error($1);
+  $result = LONG2FIX($1);
+};
+
+// ignore "bool32 *reserved" arguments
+%typemap(in, numinputs=0) bool32 *reserved (bool32 temp) {
+  temp = 0;
+  $1 = &temp;
 };
 
 %extend Task {

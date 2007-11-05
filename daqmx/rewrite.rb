@@ -1,12 +1,39 @@
 #! ruby
-# rewrite NIDAQmxBase.h for SWIG
+# rewrite.rb: Prepares SWIG declarations from NIDAQmxBase.h
+# $Id$
+
+# ruby-daqmxbase: A SWIG interface for Ruby and the NI-DAQmx Base data
+# acquisition library.
+# 
+# Copyright (C) 2007 Ned Konz
+# 
+# Licensed under the Apache License, Version 2.0 (the "License"); you
+# may not use this file except in compliance with the License.  You may
+# obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.  See the License for the specific language governing
+# permissions and limitations under the License.
+
+# Does a few things:
+# * generates %rename statements for the constants
+# * filters out non-wrapped calls using %ignore
+# * generates trivial wrappers for supported calls
+#
 
 BEGIN {
+  # these calls will not be wrapped, because they're not yet supported.
   $ignored = %w{
     DAQmxBaseReadBinaryI16 DAQmxBaseReadBinaryI32
     DAQmxBaseReadDigitalU8 DAQmxBaseReadDigitalU32
     DAQmxBaseReadCounterF64 DAQmxBaseReadCounterU32
     }
+  puts("# Automatically generated from NIDAQmxBase.h header file.")
+  puts("# Do not edit.")
 }
 
 ARGF.each_line do |line|
@@ -31,17 +58,6 @@ ARGF.each_line do |line|
     args.shift if hasSelf
     libname = prefix + suffix
 
-    callArgs = args.collect { |arg|
-      arg.sub(/^(.*[ *])([_[:alnum:]]+)( ?\[\] ?)?$/, '\2')
-    }
-    if hasSelf
-      callArgs.unshift('(TaskHandle)$self')
-    end
-    if /reserved$/.match(args[-1])
-      args.pop
-      callArgs[-1] = "NULL"
-    end
-
     rubyname = suffix.gsub(/([a-z])([A-Z])/, '\1_\2').downcase
 
     if hasSelf
@@ -51,17 +67,20 @@ ARGF.each_line do |line|
     # if we haven't figured out how to handle it yet, just skip it
     next if $ignored.include?(libname)
 
-    puts "%ignore #{libname};"
-
-    puts <<EOF
-    #{ hasSelf ? "%extend Task" : "%inline" } {
-      int32 #{rubyname}(#{args.join(", ")}) {
-        int32 result = #{libname}(#{callArgs.join(", ")});
-        if (result) handle_DAQmx_error(result);
-        return result;
-      }
-    };
+    if hasSelf
+      puts <<EOF
+%rename(\"Task_#{rubyname}\") #{libname};
+%extend Task {
+  int32 #{rubyname}(#{args.join(", ")});
+};
 EOF
+    else
+      puts <<EOF
+%rename(\"#{rubyname}\") #{libname};
+%inline { int32 #{libname}(#{args.join(", ")}); };
+EOF
+    end
+
     next
   end
 end
