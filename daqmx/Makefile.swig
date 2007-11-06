@@ -41,7 +41,8 @@ ifeq ($(OSTYPE),darwin)
 NI_DIR?=/Applications/National Instruments/NI-DAQmx Base
 NI_INC_DIR=$(NI_DIR)/includes
 LIBS+= -framework nidaqmxbase -framework nidaqmxbaselv
-else ifeq ($(OS),Windows_NT)
+else
+ifeq ($(OS),Windows_NT)
 # Win32
 NI_WIN_DIR?=$(PROGRAMFILES)/National Instruments/NI-DAQmx Base
 NI_WIN_INC_DIR?=$(NI_WIN_DIR)/Include
@@ -59,10 +60,11 @@ else
 # non-Cygwin Win32
 NI_DIR?=$(NI_WIN_DIR)
 CFLAGS+= -mno-cygwin
-endif
+endif	# end Win32
 NI_DIR:=$(subst /\,,$(subst :\,:/,$(patsubst %\,%/,$(NI_DIR))))
 NI_INC_DIR=$(NI_DIR)/Include
 else
+# non-Win32, non-Mac
 endif
 
 # quote spaces
