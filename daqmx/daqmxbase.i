@@ -80,13 +80,14 @@ int32 handle_DAQmx_error(int32 errCode)
 // patch typo in header file
 #define  DAQmxReadBinaryI32  DAQmxBaseReadBinaryI32
 
-%apply  unsigned long *OUTPUT { bool32 * };
-%apply  unsigned long *OUTPUT { int32 * };
+%apply  unsigned long *OUTPUT { bool32 *isTaskDone, int32 *sampsPerChanRead,
+  int32 *sampsPerChanWritten, uInt32 *value, uInt32 *data };
 %apply  char *OUTPUT { char errorString[] };
 %apply  float *OUTPUT { float64 *value };
-%apply  unsigned long *OUTPUT { uInt32 *value };
 
+// Allow passing Ruby array or just single (float or fix) number
 %typemap(in) (float64 writeArray[]) {
+  // *** BEGIN typemap(in) (float64 writeArray[])
   long len = 1;
   long i;
   float64 val;
@@ -133,15 +134,18 @@ Error:
       rb_raise(rb_eTypeError, "writeArray must be FIXNUM, float, or array of float or fixnum");
       break;
   };
+  // *** END typemap(in) (float64 writeArray[])
 };
 
 // free array allocated by above
 %typemap(freearg) (float64 writeArray[]) {
+  // *** typemap(freearg) (float64 writeArray[])
   if ($1) free($1);
 };
 
 // ruby size param in: alloc array of given size
 %typemap(in) (float64 readArray[], uInt32 arraySizeInSamps) {
+  // *** BEGIN typemap(in) (float64 readArray[], uInt32 arraySizeInSamps)
   long len;
 
   if (FIXNUM_P($input))
@@ -154,15 +158,18 @@ Error:
 
   $1 = calloc((size_t)len, sizeof(float64));
   $2 = (uInt32)len;
+  // *** END typemap(in) (float64 readArray[], uInt32 arraySizeInSamps)
 };
 
 // free array allocated by above
 %typemap(freearg) (float64 readArray[], uInt32 arraySizeInSamps) {
+  // *** typemap(freearg) (float64 readArray[], uInt32 arraySizeInSamps)
   if ($1) free($1);
 };
 
 // make Ruby Array of FIXNUM
 %typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps) {
+  // *** BEGIN typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps)
   long i;
   VALUE data;
   // result is return val from function
@@ -192,6 +199,7 @@ Error:
   }
 
   rb_ary_push($result, data);
+  // *** END typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps)
 };
 
 // Note that TaskHandle is typedef'd as uInt32*
@@ -200,25 +208,32 @@ Error:
   typedef struct { uInt32 t; } Task;
 };
 
+%extend Task {
+
 // pass string and size to C function
 %typemap(in) (char *str, int len) {
+  // *** BEGIN typemap(in) (char *str, int len)
   $1 = STR2CSTR($input);
   $2 = (int) RSTRING($input)->len;
+  // *** END typemap(in) (char *str, int len)
 };
 
 // pass error code return from DAQmxBase functions to Ruby
 %typemap(out) int32 {
+  // *** BEGIN typemap(out) int32
   if ($1) handle_DAQmx_error($1);
   $result = LONG2FIX($1);
+  // *** END typemap(out) int32
 };
 
 // ignore "bool32 *reserved" arguments
 %typemap(in, numinputs=0) bool32 *reserved (bool32 temp) {
+  // *** BEGIN typemap(in, numinputs=0) bool32 *reserved (bool32 temp)
   temp = 0;
   $1 = &temp;
+  // *** END typemap(in, numinputs=0) bool32 *reserved (bool32 temp)
 };
 
-%extend Task {
   // if you give a non-empty name, you get LoadTask, else CreateTask.
   Task(const char taskName[]) {
     Task *t = (Task *)calloc(1, sizeof(Task));
@@ -238,6 +253,6 @@ Error:
 };
 
 %include "daqmxbase_decls.i"
-%include "NIDAQmxBase.h"
+%import "NIDAQmxBase.h"
 
 //  vim: filetype=swig ts=2 sw=2 et ai

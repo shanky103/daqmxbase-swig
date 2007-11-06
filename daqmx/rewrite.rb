@@ -25,16 +25,21 @@
 # * generates trivial wrappers for supported calls
 #
 
-BEGIN {
-  # these calls will not be wrapped, because they're not yet supported.
-  $ignored = %w{
-    DAQmxBaseReadBinaryI16 DAQmxBaseReadBinaryI32
-    DAQmxBaseReadDigitalU8 DAQmxBaseReadDigitalU32
-    DAQmxBaseReadCounterF64 DAQmxBaseReadCounterU32
-    }
-  puts("# Automatically generated from NIDAQmxBase.h header file.")
-  puts("# Do not edit.")
-}
+# these calls will not be wrapped, because they're not yet supported.
+$ignored = %w{
+  DAQmxBaseReadBinaryI16 DAQmxBaseReadBinaryI32
+  DAQmxBaseReadDigitalU8 DAQmxBaseReadDigitalU32
+  DAQmxBaseReadCounterF64 DAQmxBaseReadCounterU32
+  }
+puts("// Automatically generated from NIDAQmxBase.h header file.")
+puts("// Do not edit.")
+
+$constantRegex = /^#define\s+(DAQmx_?)((Val|Success|Error|Warning)_?([_[:alnum:]]*))\s.*/
+$functionRegex = /^int32\s+DllExport\s+__CFUNC\s+(DAQmxBase_?)([_[:alnum:]]+)\s*\((.*)\)\s*;\s*$/
+
+# DAQmx_Val
+# DAQmx[^_]
+# Success|Failed|Error|Warning
 
 ARGF.each_line do |line|
   line.chomp!
@@ -42,23 +47,22 @@ ARGF.each_line do |line|
   line.gsub!(/DAQmxReadBinaryI32/, "DAQmxBaseReadBinaryI32")  # patch typo
 
   # Constants
-  line.sub(/^#define\s+(DAQmx_?)([_[:alnum:]]+)\s.*/) { |m|
+  if $constantRegex.match(line)
     prefix = $1
     suffix = $2
+    kind = $3
+    shortname = $4
+    libname = prefix + suffix
     rubyname = suffix.gsub(/([a-z])([A-Z])/, '\1_\2').upcase
-    puts "%rename(\"#{rubyname}\") #{prefix + suffix};"
-    next
-  }
+    puts line.sub(libname, rubyname)
 
-  # Functions
-  line.sub(/^int32\s+DllExport\s+__CFUNC\s+(DAQmxBase_?)([_[:alnum:]]+)\s*\((.*)\)\s*;\s*$/) do |m|
+  elsif $functionRegex.match(line)
     prefix = $1
     suffix = $2
     libname = prefix + suffix
     args = $3.gsub(/\s+/,' ').split(/\s*,\s*/)
-    callArgs = args.collect { |arg| arg.sub(/.*?([[:alnum:]_]+)[^[:alnum:]_]*$/, '\1') }
+    callArgs = args.collect { |arg| arg.sub(/.*?(\w+)[^\w]*$/, '\1') }
     callArgs.delete("taskHandle")
-    puts "// extern int32 #{libname}(#{args.join(", ")});"
     hasSelf = (args[0] == "TaskHandle taskHandle")
     args.shift if hasSelf
 
@@ -89,9 +93,9 @@ EOF
 %inline { int32 #{libname}(#{args.join(", ")}); };
 EOF
     end
-
-    next
   end
 end
 
-# vim: ai ts=2 sw=2 et
+puts("// " + "vim: ft=swig")
+
+# vim: set ft=ruby ai ts=2 sw=2 et

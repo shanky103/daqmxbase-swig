@@ -41,7 +41,7 @@
 #    Call Stop function at the end.
 #
 
-BEGIN { $stderr.reopen("/dev/null") }
+# BEGIN { $stderr.reopen("/dev/null") }
 
 require 'daqmxbase'
 
@@ -83,11 +83,11 @@ begin
   startTime = Time.now
   (errorCode, data, samplesPerChanRead) = task.read_analog_f64(numSamplesPerChan, timeout, fillMode, bufferSize)
   endTime = Time.now
-rescue  Exception => e
-  $stderr.reopen($stdout)
-  $stderr.puts e.message
-else
-  $stderr.reopen($stdout)
+# rescue  Exception => e
+#  $stderr.reopen($stdout)
+#  $stderr.puts e.message
+# else
+#  $stderr.reopen($stdout)
   p data
   $stdout.puts "error #{errorCode}, read #{samplesPerChanRead}, total time: #{endTime - startTime}, rate: #{samplesPerChanRead/(endTime-startTime)}"
 end
