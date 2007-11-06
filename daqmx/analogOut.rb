@@ -77,7 +77,7 @@ begin
 #   $stderr.reopen($stdout)
 #   $stderr.puts e.message
 # else
-  $stderr.reopen($stdout)
+#  $stderr.reopen($stdout)
   p data
   $stdout.puts "error #{errorCode}, write #{samplesPerChanRead}, total time: #{endTime - startTime}, rate: #{samplesPerChanRead/(endTime-startTime)}"
 end

@@ -30,26 +30,35 @@ RUBY?=ruby
 CYGWIN_VIM?=no
 
 # for .vimrc:
+#
 RUBYPATH?=$(shell ruby -e 'print $$:.join(",")')
 SWIGPATH?=$(SWIGLIB)/ruby,$(SWIGLIB)
 
 OSTYPE?=$(shell uname -o)
 
 ifeq ($(OSTYPE),darwin)
+# Mac OS/X
 NI_DIR?=/Applications/National Instruments/NI-DAQmx Base
 NI_INC_DIR=$(NI_DIR)/includes
 LIBS+= -framework nidaqmxbase -framework nidaqmxbaselv
 else ifeq ($(OS),Windows_NT)
+# Win32
 NI_WIN_DIR?=$(PROGRAMFILES)/National Instruments/NI-DAQmx Base
 NI_WIN_INC_DIR?=$(NI_WIN_DIR)/Include
-LDFLAGS+= -Wl,-L\"$(NI_DIR)/Lib\" '-Wl,--dll-search-prefix='
+LDFLAGS+= -Wl,--export-all-symbols -Wl,-L\"$(NI_DIR)/Lib\" -Wl,--dll-search-prefix=\"\" \"-Wl,--exclude-symbols,\x7fnidaqmxbase_NULL_THUNK_DATA\"
 LIBS+= -lnidaqmxbase
-CPPFLAGS+= -DWIN32
-CFLAGS+= -mno-cygwin -Wl,--add-stdcall-alias
 ifeq ($(OSTYPE),Cygwin)
+# Cygwin Win32
 NI_DIR?=$(shell cygpath -u "$(NI_WIN_DIR)")
+CFLAGS+= -mcygwin
+ifeq ($(CYGWIN_VIM),no)
+RUBYPATH:=$(shell cygpath -m $(shell ruby -e 'print $$:.join(" ")') | tr '\n' ',')
+SWIGPATH:=$(shell cygpath -m $(SWIGLIB)/ruby $(SWIGLIB) | tr '\n' ',')
+endif
 else
+# non-Cygwin Win32
 NI_DIR?=$(NI_WIN_DIR)
+CFLAGS+= -mno-cygwin
 endif
 NI_DIR:=$(subst /\,,$(subst :\,:/,$(patsubst %\,%/,$(NI_DIR))))
 NI_INC_DIR=$(NI_DIR)/Include

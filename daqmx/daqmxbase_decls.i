@@ -671,164 +671,196 @@
 %rename("create_task") DAQmxBaseCreateTask;
 %inline { int32 DAQmxBaseCreateTask(const char taskName[], TaskHandle *taskHandle); };
 // extern int32 DAQmxBaseStartTask(TaskHandle taskHandle);
+%ignore DAQmxBaseStartTask;
 %extend Task {
-  %rename("start") DAQmxBaseStartTask;
-  int32 start();
+  int32 start()
+    { return DAQmxBaseStartTask((TaskHandle)(void *)$self); }
 };
 // extern int32 DAQmxBaseStopTask(TaskHandle taskHandle);
+%ignore DAQmxBaseStopTask;
 %extend Task {
-  %rename("stop") DAQmxBaseStopTask;
-  int32 stop();
+  int32 stop()
+    { return DAQmxBaseStopTask((TaskHandle)(void *)$self); }
 };
 // extern int32 DAQmxBaseClearTask(TaskHandle taskHandle);
+%ignore DAQmxBaseClearTask;
 %extend Task {
-  %rename("clear") DAQmxBaseClearTask;
-  int32 clear();
+  int32 clear()
+    { return DAQmxBaseClearTask((TaskHandle)(void *)$self); }
 };
 // extern int32 DAQmxBaseIsTaskDone(TaskHandle taskHandle, bool32 *isTaskDone);
+%ignore DAQmxBaseIsTaskDone;
 %extend Task {
-  %rename("is_task_done") DAQmxBaseIsTaskDone;
-  int32 is_task_done(bool32 *isTaskDone);
+  int32 is_task_done(bool32 *isTaskDone)
+    { return DAQmxBaseIsTaskDone((TaskHandle)(void *)$self, isTaskDone); }
 };
 // extern int32 DAQmxBaseCreateAIVoltageChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
+%ignore DAQmxBaseCreateAIVoltageChan;
 %extend Task {
-  %rename("create_aivoltage_chan") DAQmxBaseCreateAIVoltageChan;
-  int32 create_aivoltage_chan(const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
+  int32 create_aivoltage_chan(const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, const char customScaleName[])
+    { return DAQmxBaseCreateAIVoltageChan((TaskHandle)(void *)$self, physicalChannel, nameToAssignToChannel, terminalConfig, minVal, maxVal, units, customScaleName); }
 };
 // extern int32 DAQmxBaseCreateAIThrmcplChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 thermocoupleType, int32 cjcSource, float64 cjcVal, const char cjcChannel[]);
+%ignore DAQmxBaseCreateAIThrmcplChan;
 %extend Task {
-  %rename("create_aithrmcpl_chan") DAQmxBaseCreateAIThrmcplChan;
-  int32 create_aithrmcpl_chan(const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 thermocoupleType, int32 cjcSource, float64 cjcVal, const char cjcChannel[]);
+  int32 create_aithrmcpl_chan(const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 thermocoupleType, int32 cjcSource, float64 cjcVal, const char cjcChannel[])
+    { return DAQmxBaseCreateAIThrmcplChan((TaskHandle)(void *)$self, physicalChannel, nameToAssignToChannel, minVal, maxVal, units, thermocoupleType, cjcSource, cjcVal, cjcChannel); }
 };
 // extern int32 DAQmxBaseCreateAOVoltageChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
+%ignore DAQmxBaseCreateAOVoltageChan;
 %extend Task {
-  %rename("create_aovoltage_chan") DAQmxBaseCreateAOVoltageChan;
-  int32 create_aovoltage_chan(const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
+  int32 create_aovoltage_chan(const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, const char customScaleName[])
+    { return DAQmxBaseCreateAOVoltageChan((TaskHandle)(void *)$self, physicalChannel, nameToAssignToChannel, minVal, maxVal, units, customScaleName); }
 };
 // extern int32 DAQmxBaseCreateDIChan(TaskHandle taskHandle, const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
+%ignore DAQmxBaseCreateDIChan;
 %extend Task {
-  %rename("create_dichan") DAQmxBaseCreateDIChan;
-  int32 create_dichan(const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
+  int32 create_dichan(const char lines[], const char nameToAssignToLines[], int32 lineGrouping)
+    { return DAQmxBaseCreateDIChan((TaskHandle)(void *)$self, lines, nameToAssignToLines, lineGrouping); }
 };
 // extern int32 DAQmxBaseCreateDOChan(TaskHandle taskHandle, const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
+%ignore DAQmxBaseCreateDOChan;
 %extend Task {
-  %rename("create_dochan") DAQmxBaseCreateDOChan;
-  int32 create_dochan(const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
+  int32 create_dochan(const char lines[], const char nameToAssignToLines[], int32 lineGrouping)
+    { return DAQmxBaseCreateDOChan((TaskHandle)(void *)$self, lines, nameToAssignToLines, lineGrouping); }
 };
 // extern int32 DAQmxBaseCreateCIPeriodChan(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 edge, int32 measMethod, float64 measTime, uInt32 divisor, const char customScaleName[]);
+%ignore DAQmxBaseCreateCIPeriodChan;
 %extend Task {
-  %rename("create_ciperiod_chan") DAQmxBaseCreateCIPeriodChan;
-  int32 create_ciperiod_chan(const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 edge, int32 measMethod, float64 measTime, uInt32 divisor, const char customScaleName[]);
+  int32 create_ciperiod_chan(const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 edge, int32 measMethod, float64 measTime, uInt32 divisor, const char customScaleName[])
+    { return DAQmxBaseCreateCIPeriodChan((TaskHandle)(void *)$self, counter, nameToAssignToChannel, minVal, maxVal, units, edge, measMethod, measTime, divisor, customScaleName); }
 };
 // extern int32 DAQmxBaseCreateCICountEdgesChan(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], int32 edge, uInt32 initialCount, int32 countDirection);
+%ignore DAQmxBaseCreateCICountEdgesChan;
 %extend Task {
-  %rename("create_cicount_edges_chan") DAQmxBaseCreateCICountEdgesChan;
-  int32 create_cicount_edges_chan(const char counter[], const char nameToAssignToChannel[], int32 edge, uInt32 initialCount, int32 countDirection);
+  int32 create_cicount_edges_chan(const char counter[], const char nameToAssignToChannel[], int32 edge, uInt32 initialCount, int32 countDirection)
+    { return DAQmxBaseCreateCICountEdgesChan((TaskHandle)(void *)$self, counter, nameToAssignToChannel, edge, initialCount, countDirection); }
 };
 // extern int32 DAQmxBaseCreateCIPulseWidthChan(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 startingEdge, const char customScaleName[]);
+%ignore DAQmxBaseCreateCIPulseWidthChan;
 %extend Task {
-  %rename("create_cipulse_width_chan") DAQmxBaseCreateCIPulseWidthChan;
-  int32 create_cipulse_width_chan(const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 startingEdge, const char customScaleName[]);
+  int32 create_cipulse_width_chan(const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 startingEdge, const char customScaleName[])
+    { return DAQmxBaseCreateCIPulseWidthChan((TaskHandle)(void *)$self, counter, nameToAssignToChannel, minVal, maxVal, units, startingEdge, customScaleName); }
 };
 // extern int32 DAQmxBaseCreateCOPulseChanFreq(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], int32 units, int32 idleState, float64 initialDelay, float64 freq, float64 dutyCycle);
+%ignore DAQmxBaseCreateCOPulseChanFreq;
 %extend Task {
-  %rename("create_copulse_chan_freq") DAQmxBaseCreateCOPulseChanFreq;
-  int32 create_copulse_chan_freq(const char counter[], const char nameToAssignToChannel[], int32 units, int32 idleState, float64 initialDelay, float64 freq, float64 dutyCycle);
+  int32 create_copulse_chan_freq(const char counter[], const char nameToAssignToChannel[], int32 units, int32 idleState, float64 initialDelay, float64 freq, float64 dutyCycle)
+    { return DAQmxBaseCreateCOPulseChanFreq((TaskHandle)(void *)$self, counter, nameToAssignToChannel, units, idleState, initialDelay, freq, dutyCycle); }
 };
 // extern int32 DAQmxBaseCfgSampClkTiming(TaskHandle taskHandle, const char source[], float64 rate, int32 activeEdge, int32 sampleMode, uInt64 sampsPerChan);
+%ignore DAQmxBaseCfgSampClkTiming;
 %extend Task {
-  %rename("cfg_samp_clk_timing") DAQmxBaseCfgSampClkTiming;
-  int32 cfg_samp_clk_timing(const char source[], float64 rate, int32 activeEdge, int32 sampleMode, uInt64 sampsPerChan);
+  int32 cfg_samp_clk_timing(const char source[], float64 rate, int32 activeEdge, int32 sampleMode, uInt64 sampsPerChan)
+    { return DAQmxBaseCfgSampClkTiming((TaskHandle)(void *)$self, source, rate, activeEdge, sampleMode, sampsPerChan); }
 };
 // extern int32 DAQmxBaseCfgImplicitTiming(TaskHandle taskHandle, int32 sampleMode, uInt64 sampsPerChan);
+%ignore DAQmxBaseCfgImplicitTiming;
 %extend Task {
-  %rename("cfg_implicit_timing") DAQmxBaseCfgImplicitTiming;
-  int32 cfg_implicit_timing(int32 sampleMode, uInt64 sampsPerChan);
+  int32 cfg_implicit_timing(int32 sampleMode, uInt64 sampsPerChan)
+    { return DAQmxBaseCfgImplicitTiming((TaskHandle)(void *)$self, sampleMode, sampsPerChan); }
 };
 // extern int32 DAQmxBaseDisableStartTrig(TaskHandle taskHandle);
+%ignore DAQmxBaseDisableStartTrig;
 %extend Task {
-  %rename("disable_start_trig") DAQmxBaseDisableStartTrig;
-  int32 disable_start_trig();
+  int32 disable_start_trig()
+    { return DAQmxBaseDisableStartTrig((TaskHandle)(void *)$self); }
 };
 // extern int32 DAQmxBaseCfgDigEdgeStartTrig(TaskHandle taskHandle, const char triggerSource[], int32 triggerEdge);
+%ignore DAQmxBaseCfgDigEdgeStartTrig;
 %extend Task {
-  %rename("cfg_dig_edge_start_trig") DAQmxBaseCfgDigEdgeStartTrig;
-  int32 cfg_dig_edge_start_trig(const char triggerSource[], int32 triggerEdge);
+  int32 cfg_dig_edge_start_trig(const char triggerSource[], int32 triggerEdge)
+    { return DAQmxBaseCfgDigEdgeStartTrig((TaskHandle)(void *)$self, triggerSource, triggerEdge); }
 };
 // extern int32 DAQmxBaseCfgAnlgEdgeStartTrig(TaskHandle taskHandle, const char triggerSource[], int32 triggerSlope, float64 triggerLevel);
+%ignore DAQmxBaseCfgAnlgEdgeStartTrig;
 %extend Task {
-  %rename("cfg_anlg_edge_start_trig") DAQmxBaseCfgAnlgEdgeStartTrig;
-  int32 cfg_anlg_edge_start_trig(const char triggerSource[], int32 triggerSlope, float64 triggerLevel);
+  int32 cfg_anlg_edge_start_trig(const char triggerSource[], int32 triggerSlope, float64 triggerLevel)
+    { return DAQmxBaseCfgAnlgEdgeStartTrig((TaskHandle)(void *)$self, triggerSource, triggerSlope, triggerLevel); }
 };
 // extern int32 DAQmxBaseDisableRefTrig(TaskHandle taskHandle);
+%ignore DAQmxBaseDisableRefTrig;
 %extend Task {
-  %rename("disable_ref_trig") DAQmxBaseDisableRefTrig;
-  int32 disable_ref_trig();
+  int32 disable_ref_trig()
+    { return DAQmxBaseDisableRefTrig((TaskHandle)(void *)$self); }
 };
 // extern int32 DAQmxBaseCfgDigEdgeRefTrig(TaskHandle taskHandle, const char triggerSource[], int32 triggerEdge, uInt32 pretriggerSamples);
+%ignore DAQmxBaseCfgDigEdgeRefTrig;
 %extend Task {
-  %rename("cfg_dig_edge_ref_trig") DAQmxBaseCfgDigEdgeRefTrig;
-  int32 cfg_dig_edge_ref_trig(const char triggerSource[], int32 triggerEdge, uInt32 pretriggerSamples);
+  int32 cfg_dig_edge_ref_trig(const char triggerSource[], int32 triggerEdge, uInt32 pretriggerSamples)
+    { return DAQmxBaseCfgDigEdgeRefTrig((TaskHandle)(void *)$self, triggerSource, triggerEdge, pretriggerSamples); }
 };
 // extern int32 DAQmxBaseCfgAnlgEdgeRefTrig(TaskHandle taskHandle, const char triggerSource[], int32 triggerSlope, float64 triggerLevel, uInt32 pretriggerSamples);
+%ignore DAQmxBaseCfgAnlgEdgeRefTrig;
 %extend Task {
-  %rename("cfg_anlg_edge_ref_trig") DAQmxBaseCfgAnlgEdgeRefTrig;
-  int32 cfg_anlg_edge_ref_trig(const char triggerSource[], int32 triggerSlope, float64 triggerLevel, uInt32 pretriggerSamples);
+  int32 cfg_anlg_edge_ref_trig(const char triggerSource[], int32 triggerSlope, float64 triggerLevel, uInt32 pretriggerSamples)
+    { return DAQmxBaseCfgAnlgEdgeRefTrig((TaskHandle)(void *)$self, triggerSource, triggerSlope, triggerLevel, pretriggerSamples); }
 };
 // extern int32 DAQmxBaseReadAnalogF64(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+%ignore DAQmxBaseReadAnalogF64;
 %extend Task {
-  %rename("read_analog_f64") DAQmxBaseReadAnalogF64;
-  int32 read_analog_f64(int32 numSampsPerChan, float64 timeout, bool32 fillMode, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+  int32 read_analog_f64(int32 numSampsPerChan, float64 timeout, bool32 fillMode, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
+    { return DAQmxBaseReadAnalogF64((TaskHandle)(void *)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved); }
 };
 // extern int32 DAQmxBaseReadBinaryI16(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, int16 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
 %ignore DAQmxBaseReadBinaryI16;
+// extern int32 DAQmxBaseReadBinaryI32(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, int32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+%ignore DAQmxBaseReadBinaryI32;
 // extern int32 DAQmxBaseReadDigitalU8(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt8 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
 %ignore DAQmxBaseReadDigitalU8;
 // extern int32 DAQmxBaseReadDigitalU32(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
 %ignore DAQmxBaseReadDigitalU32;
 // extern int32 DAQmxBaseReadDigitalScalarU32(TaskHandle taskHandle, float64 timeout, uInt32 *value, bool32 *reserved);
+%ignore DAQmxBaseReadDigitalScalarU32;
 %extend Task {
-  %rename("read_digital_scalar_u32") DAQmxBaseReadDigitalScalarU32;
-  int32 read_digital_scalar_u32(float64 timeout, uInt32 *value, bool32 *reserved);
+  int32 read_digital_scalar_u32(float64 timeout, uInt32 *value, bool32 *reserved)
+    { return DAQmxBaseReadDigitalScalarU32((TaskHandle)(void *)$self, timeout, value, reserved); }
 };
 // extern int32 DAQmxBaseReadCounterF64(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
 %ignore DAQmxBaseReadCounterF64;
 // extern int32 DAQmxBaseReadCounterU32(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
 %ignore DAQmxBaseReadCounterU32;
 // extern int32 DAQmxBaseReadCounterScalarF64(TaskHandle taskHandle, float64 timeout, float64 *value, bool32 *reserved);
+%ignore DAQmxBaseReadCounterScalarF64;
 %extend Task {
-  %rename("read_counter_scalar_f64") DAQmxBaseReadCounterScalarF64;
-  int32 read_counter_scalar_f64(float64 timeout, float64 *value, bool32 *reserved);
+  int32 read_counter_scalar_f64(float64 timeout, float64 *value, bool32 *reserved)
+    { return DAQmxBaseReadCounterScalarF64((TaskHandle)(void *)$self, timeout, value, reserved); }
 };
 // extern int32 DAQmxBaseReadCounterScalarU32(TaskHandle taskHandle, float64 timeout, uInt32 *value, bool32 *reserved);
+%ignore DAQmxBaseReadCounterScalarU32;
 %extend Task {
-  %rename("read_counter_scalar_u32") DAQmxBaseReadCounterScalarU32;
-  int32 read_counter_scalar_u32(float64 timeout, uInt32 *value, bool32 *reserved);
+  int32 read_counter_scalar_u32(float64 timeout, uInt32 *value, bool32 *reserved)
+    { return DAQmxBaseReadCounterScalarU32((TaskHandle)(void *)$self, timeout, value, reserved); }
 };
 // extern int32 DAQmxBaseWriteAnalogF64(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, float64 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+%ignore DAQmxBaseWriteAnalogF64;
 %extend Task {
-  %rename("write_analog_f64") DAQmxBaseWriteAnalogF64;
-  int32 write_analog_f64(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, float64 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+  int32 write_analog_f64(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, float64 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved)
+    { return DAQmxBaseWriteAnalogF64((TaskHandle)(void *)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved); }
 };
 // extern int32 DAQmxBaseWriteDigitalU8(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt8 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+%ignore DAQmxBaseWriteDigitalU8;
 %extend Task {
-  %rename("write_digital_u8") DAQmxBaseWriteDigitalU8;
-  int32 write_digital_u8(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt8 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+  int32 write_digital_u8(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt8 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved)
+    { return DAQmxBaseWriteDigitalU8((TaskHandle)(void *)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved); }
 };
 // extern int32 DAQmxBaseWriteDigitalU32(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt32 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+%ignore DAQmxBaseWriteDigitalU32;
 %extend Task {
-  %rename("write_digital_u32") DAQmxBaseWriteDigitalU32;
-  int32 write_digital_u32(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt32 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+  int32 write_digital_u32(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt32 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved)
+    { return DAQmxBaseWriteDigitalU32((TaskHandle)(void *)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved); }
 };
 // extern int32 DAQmxBaseWriteDigitalScalarU32(TaskHandle taskHandle, bool32 autoStart, float64 timeout, uInt32 value, bool32 *reserved);
+%ignore DAQmxBaseWriteDigitalScalarU32;
 %extend Task {
-  %rename("write_digital_scalar_u32") DAQmxBaseWriteDigitalScalarU32;
-  int32 write_digital_scalar_u32(bool32 autoStart, float64 timeout, uInt32 value, bool32 *reserved);
+  int32 write_digital_scalar_u32(bool32 autoStart, float64 timeout, uInt32 value, bool32 *reserved)
+    { return DAQmxBaseWriteDigitalScalarU32((TaskHandle)(void *)$self, autoStart, timeout, value, reserved); }
 };
 // extern int32 DAQmxBaseCfgInputBuffer(TaskHandle taskHandle, uInt32 numSampsPerChan);
+%ignore DAQmxBaseCfgInputBuffer;
 %extend Task {
-  %rename("cfg_input_buffer") DAQmxBaseCfgInputBuffer;
-  int32 cfg_input_buffer(uInt32 numSampsPerChan);
+  int32 cfg_input_buffer(uInt32 numSampsPerChan)
+    { return DAQmxBaseCfgInputBuffer((TaskHandle)(void *)$self, numSampsPerChan); }
 };
 %rename("VAL_SWITCH_TOPOLOGY_1127_1_WIRE_64X1_MUX") DAQmx_Val_Switch_Topology_1127_1_Wire_64x1_Mux;
 %rename("VAL_SWITCH_TOPOLOGY_1127_2_WIRE_32X1_MUX") DAQmx_Val_Switch_Topology_1127_2_Wire_32x1_Mux;

@@ -39,6 +39,7 @@ BEGIN {
 ARGF.each_line do |line|
   line.chomp!
   line.gsub!(/\s+/, ' ')
+  line.gsub!(/DAQmxReadBinaryI32/, "DAQmxBaseReadBinaryI32")  # patch typo
 
   # Constants
   line.sub(/^#define\s+(DAQmx_?)([_[:alnum:]]+)\s.*/) { |m|
@@ -55,6 +56,8 @@ ARGF.each_line do |line|
     suffix = $2
     libname = prefix + suffix
     args = $3.gsub(/\s+/,' ').split(/\s*,\s*/)
+    callArgs = args.collect { |arg| arg.sub(/.*?([[:alnum:]_]+)[^[:alnum:]_]*$/, '\1') }
+    callArgs.delete("taskHandle")
     puts "// extern int32 #{libname}(#{args.join(", ")});"
     hasSelf = (args[0] == "TaskHandle taskHandle")
     args.shift if hasSelf
@@ -63,6 +66,7 @@ ARGF.each_line do |line|
 
     if hasSelf
       rubyname = rubyname.sub(/_task$/, '')
+      callArgs.unshift("(TaskHandle)(void *)$self")
     end
 
     # if we haven't figured out how to handle it yet, just skip it
@@ -73,9 +77,10 @@ ARGF.each_line do |line|
 
     if hasSelf
       puts <<EOF
+%ignore #{libname};
 %extend Task {
-  %rename(\"#{rubyname}\") #{libname};
-  int32 #{rubyname}(#{args.join(", ")});
+  int32 #{rubyname}(#{args.join(", ")})
+    { return #{libname}(#{callArgs.join(", ")}); }
 };
 EOF
     else
