@@ -8,7 +8,7 @@ def testOne
 
   task = Daqmxbase::Task.new("")
 print "create_aivoltage_chan: "
-  p *task.create_aivoltage_chan("Dev1/ai0","",Daqmxbase::VAL_CFG_DEFAULT,-1.0,1.0,Daqmxbase::VAL_VOLTS,"")
+  p *task.create_aivoltage_chan("Dev1/ai0",Daqmxbase::VAL_CFG_DEFAULT,-1.0,1.0,Daqmxbase::VAL_VOLTS)
 print "start: "
   p *task.start()
 print "read_analog_f64: " 

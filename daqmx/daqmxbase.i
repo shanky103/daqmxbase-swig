@@ -203,29 +203,38 @@ Error:
 
 %extend Task {
 
-// pass string and size to C function
-%typemap(in) (char *str, int len) {
-  // *** BEGIN typemap(in) (char *str, int len)
-  $1 = STR2CSTR($input);
-  $2 = (int) RSTRING($input)->len;
-  // *** END typemap(in) (char *str, int len)
-};
+  // pass string and size to C function
+  %typemap(in) (char *str, int len) {
+    // *** BEGIN typemap(in) (char *str, int len)
+    $1 = STR2CSTR($input);
+    $2 = (int) RSTRING($input)->len;
+    // *** END typemap(in) (char *str, int len)
+  };
 
-// pass error code return from DAQmxBase functions to Ruby
-%typemap(out) int32 {
-  // *** BEGIN typemap(out) int32
-  if ($1) handle_DAQmx_error($1);
-  $result = LONG2FIX($1);
-  // *** END typemap(out) int32
-};
+  // pass error code return from DAQmxBase functions to Ruby
+  %typemap(out) int32 {
+    // *** BEGIN typemap(out) int32
+    if ($1) handle_DAQmx_error($1);
+    $result = LONG2FIX($1);
+    // *** END typemap(out) int32
+  };
 
-// ignore "bool32 *reserved" arguments
-%typemap(in, numinputs=0) bool32 *reserved (bool32 temp) {
-  // *** BEGIN typemap(in, numinputs=0) bool32 *reserved (bool32 temp)
-  temp = 0;
-  $1 = &temp;
-  // *** END typemap(in, numinputs=0) bool32 *reserved (bool32 temp)
-};
+  // ignore "bool32 *reserved" arguments
+  %typemap(in, numinputs=0) bool32 *reserved (bool32 temp) {
+    // *** BEGIN typemap(in, numinputs=0) bool32 *reserved (bool32 temp)
+    temp = 0;
+    $1 = &temp;
+    // *** END typemap(in, numinputs=0) bool32 *reserved (bool32 temp)
+  };
+
+  // ignore "const char nameToAssignToChannel[]" arguments
+  // ignore "const char customScaleName[]" arguments
+  %typemap(in, numinputs=0) const char nameToAssignToChannel[],
+                            const char customScaleName[] {
+    // *** BEGIN typemap(in, numinputs=0) const char nameToAssignToChannel[]/customScaleName
+    $1 = NULL;
+    // *** END typemap(in, numinputs=0) const char nameToAssignToChannel[]/customScaleName
+  };
 
   // if you give a non-empty name, you get LoadTask, else CreateTask.
   Task(const char taskName[]) {

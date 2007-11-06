@@ -41,7 +41,8 @@
 #    Call Stop function at the end.
 #
 
-BEGIN { $stderr.reopen("/dev/null") }
+$suppressStderr = false
+BEGIN { $stderr.reopen("/dev/null") if $suppressStderr }
 
 require 'daqmxbase'
 
@@ -50,34 +51,35 @@ task = nil
 
 # Channel parameters
 chan = "Dev1/ao0"
-nameToAssignToChannel = ""
 terminalConfig = Daqmxbase::VAL_CFG_DEFAULT
 min = 0.0
 max = 5.0
 units = Daqmxbase::VAL_VOLTS
-customScaleName = ""
-
-# Timing parameters
-samplesPerChan = 3
 
 # Data write parameters
-timeout = 10.0
-data = [ 1.0, 2.0, 3.0 ]
+data = [ 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 4.0, 3.0, 2.0, 1.0 ] * 1000
 fillMode = Daqmxbase::VAL_GROUP_BY_CHANNEL # or Daqmxbase::VAL_GROUP_BY_SCAN_NUMBER
+samplesPerChan = data.size
+timeout = (data.size / 150.0) * 2
 
 begin
   task = Daqmxbase::Task.new(nil)
-  task.create_aovoltage_chan(chan, nameToAssignToChannel, min, max, units, customScaleName) 
+  task.create_aovoltage_chan(chan, min, max, units) 
   task.start()
 
+	while true
   startTime = Time.now
   (errorCode, samplesPerChanRead) = task.write_analog_f64(samplesPerChan, 0, timeout, fillMode, data)
   endTime = Time.now
+	rate = samplesPerChanRead/(endTime-startTime)
+	$stdout.puts "error #{errorCode}, write #{samplesPerChanRead}, total time: #{endTime - startTime}, rate: #{rate}"
+	end
+
 rescue  Exception => e
-  $stderr.reopen($stdout)
+  $stderr.reopen($stdout) if $suppressStderr
   raise
 else
- $stderr.reopen($stdout)
-  p data
-  $stdout.puts "error #{errorCode}, write #{samplesPerChanRead}, total time: #{endTime - startTime}, rate: #{samplesPerChanRead/(endTime-startTime)}"
+	$stderr.reopen($stdout) if $suppressStderr
 end
+
+# vim: ft=ruby ts=2 sw=2 et
