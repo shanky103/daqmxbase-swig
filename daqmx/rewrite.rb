@@ -27,9 +27,6 @@
 
 # these calls will not be wrapped, because they're not yet supported.
 $ignored = %w{
-  DAQmxBaseReadBinaryI16 DAQmxBaseReadBinaryI32
-  DAQmxBaseReadDigitalU8 DAQmxBaseReadDigitalU32
-  DAQmxBaseReadCounterF64 DAQmxBaseReadCounterU32
   }
 puts("// Automatically generated from NIDAQmxBase.h header file.")
 puts("// Do not edit.")

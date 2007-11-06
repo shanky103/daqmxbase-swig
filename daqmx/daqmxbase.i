@@ -40,7 +40,7 @@
 static VALUE dmxError = Qnil;
 static VALUE dmxWarning = Qnil;
 
-int32 handle_DAQmx_error(int32 errCode)
+static int32 handle_DAQmx_error(int32 errCode)
 {
   size_t errorBufferSize;
   char *errorBuffer;
@@ -79,18 +79,21 @@ int32 handle_DAQmx_error(int32 errCode)
 %apply  float *OUTPUT { float64 *value };
 
 // Allow passing Ruby array or just single (float or fix) number
-%typemap(in) (float64 writeArray[]) {
-  // *** BEGIN typemap(in) (float64 writeArray[])
+%typemap(in) float64 writeArray[],
+             uInt8 writeArray[],
+             uInt32 writeArray[]
+{
+  // *** BEGIN typemap(in) (<T> writeArray[])
   long len = 1;
   long i;
-  float64 val;
-  $1 = calloc(len, sizeof(float64));
+  $1_basetype val;
+  $1 = calloc(len, sizeof($1_basetype));
 
   switch (rb_type($input))
   {
     case T_ARRAY:
       len = RARRAY($input)->len;
-      $1 = realloc($1, sizeof(float64)*(size_t)len);
+      $1 = realloc($1, sizeof($1_basetype)*(size_t)len);
       for (i = 0; i < len; i++)
       {
         VALUE v;
@@ -98,11 +101,11 @@ int32 handle_DAQmx_error(int32 errCode)
         switch (rb_type(v))
         {
           case T_FIXNUM:
-            val = (float64)FIX2LONG(v);
+            val = ($1_basetype)FIX2LONG(v);
             break;
 
           case T_FLOAT:
-            val = (float64)RFLOAT(v)->value;
+            val = ($1_basetype)RFLOAT(v)->value;
             break;
 
           default:
@@ -113,11 +116,11 @@ int32 handle_DAQmx_error(int32 errCode)
       break;
 
     case T_FIXNUM:
-      val = (float64)FIX2LONG($input);
+      val = ($1_basetype)FIX2LONG($input);
       break;
 
     case T_FLOAT:
-      val = (float64)RFLOAT($input)->value;
+      val = ($1_basetype)RFLOAT($input)->value;
       break;
 
 Error:
@@ -127,7 +130,7 @@ Error:
       rb_raise(rb_eTypeError, "writeArray must be FIXNUM, float, or array of float or fixnum");
       break;
   };
-  // *** END typemap(in) (float64 writeArray[])
+  // *** END typemap(in) (<T> writeArray[])
 };
 
 // free array allocated by above
@@ -137,8 +140,11 @@ Error:
 };
 
 // ruby size param in: alloc array of given size
-%typemap(in) (float64 readArray[], uInt32 arraySizeInSamps) {
-  // *** BEGIN typemap(in) (float64 readArray[], uInt32 arraySizeInSamps)
+%typemap(in) (float64 readArray[], uInt32 arraySizeInSamps),
+             (uInt8 readArray[], uInt32 arraySizeInSamps),
+             (uInt16 readArray[], uInt32 arraySizeInSamps),
+             (uInt32 readArray[], uInt32 arraySizeInSamps) {
+  // *** BEGIN typemap(in) (<T> readArray[], uInt32 arraySizeInSamps)
   long len;
 
   if (FIXNUM_P($input))
@@ -149,18 +155,60 @@ Error:
   if (len <= 0)
     rb_raise(rb_eRangeError, "readArray size must be > 0 (but got %ld)", len);
 
-  $1 = calloc((size_t)len, sizeof(float64));
+  $1 = calloc((size_t)len, sizeof($1_basetype));
   $2 = (uInt32)len;
-  // *** END typemap(in) (float64 readArray[], uInt32 arraySizeInSamps)
+  // *** END typemap(in) (<T> readArray[], uInt32 arraySizeInSamps)
 };
 
 // free array allocated by above
-%typemap(freearg) (float64 readArray[], uInt32 arraySizeInSamps) {
+%typemap(freearg) (float64 readArray[], uInt32 arraySizeInSamps),
+             (uInt8 readArray[], uInt32 arraySizeInSamps),
+             (uInt16 readArray[], uInt32 arraySizeInSamps),
+             (uInt32 readArray[], uInt32 arraySizeInSamps) {
   // *** typemap(freearg) (float64 readArray[], uInt32 arraySizeInSamps)
   if ($1) free($1);
 };
 
-// make Ruby Array of FIXNUM
+// make Ruby Array of FIXNUMs
+%typemap(argout) (uInt8 readArray[], uInt32 arraySizeInSamps),
+                 (uInt16 readArray[], uInt32 arraySizeInSamps),
+                 (uInt32 readArray[], uInt32 arraySizeInSamps) {
+  // *** BEGIN typemap(argout) (uIntx readArray[], uInt32 arraySizeInSamps)
+  long i;
+  VALUE data;
+  // result is return val from function
+  if (result != 0)
+  {
+    $result = Qnil;
+    free($1);
+    handle_DAQmx_error(result);
+  }
+
+  // create Ruby array of given length
+  data = rb_ary_new2($2);
+
+  // populate it an element at a time.
+  for (i = 0; i < (long)$2; i++)
+  {
+    rb_ary_store(data, i, ULONG2NUM($1[i]));
+  }
+
+  // $result is what will be passed to Ruby
+  if (rb_type($result) != T_ARRAY)
+  {
+    if ($result != Qnil)
+    {
+      VALUE oldResult = $result;
+      $result = rb_ary_new();
+      rb_ary_push($result, oldResult);
+    }
+  }
+
+  rb_ary_push($result, data);
+  // *** END typemap(argout) (uIntx readArray[], uInt32 arraySizeInSamps)
+};
+
+// make Ruby Array of floats
 %typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps) {
   // *** BEGIN typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps)
   long i;
@@ -230,10 +278,29 @@ Error:
   // ignore "const char nameToAssignToChannel[]" arguments
   // ignore "const char customScaleName[]" arguments
   %typemap(in, numinputs=0) const char nameToAssignToChannel[],
+                            const char nameToAssignToLines[],
                             const char customScaleName[] {
     // *** BEGIN typemap(in, numinputs=0) const char nameToAssignToChannel[]/customScaleName
     $1 = NULL;
     // *** END typemap(in, numinputs=0) const char nameToAssignToChannel[]/customScaleName
+  };
+
+  %typemap(in, numinputs=0) int32 lineGrouping {
+    // *** BEGIN typemap(in, numinputs=0) int32 lineGrouping
+    $1 = DAQmx_Val_ChanForAllLines;
+    // *** END typemap(in, numinputs=0) int32 lineGrouping
+  };
+
+  %typemap(in, numinputs=0) int32 measMethod {
+    // *** BEGIN typemap(in, numinputs=0) int32 measMethod
+    $1 = DAQmx_Val_LowFreq1Ctr;
+    // *** END typemap(in, numinputs=0) int32 measMethod
+  };
+
+  %typemap(in, numinputs=0) float64 measTime {
+    // *** BEGIN typemap(in, numinputs=0) int32 measTime
+    $1 = 0.0;
+    // *** END typemap(in, numinputs=0) int32 measTime
   };
 
   // if you give a non-empty name, you get LoadTask, else CreateTask.
