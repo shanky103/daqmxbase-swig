@@ -34,38 +34,37 @@ CYGWIN_VIM?=no
 RUBYPATH?=$(shell ruby -e 'print $$:.join(",")')
 SWIGPATH?=$(SWIGLIB)/ruby,$(SWIGLIB)
 
-OSTYPE?=$(shell uname -o)
+OSTYPE?=$(shell uname -s)
 
-ifeq ($(OSTYPE),darwin)
-# Mac OS/X
-NI_DIR?=/Applications/National Instruments/NI-DAQmx Base
-NI_INC_DIR=$(NI_DIR)/includes
-LIBS+= -framework nidaqmxbase -framework nidaqmxbaselv
-else
-ifeq ($(OS),Windows_NT)
-# Win32
-NI_WIN_DIR?=$(PROGRAMFILES)/National Instruments/NI-DAQmx Base
-NI_WIN_INC_DIR?=$(NI_WIN_DIR)/Include
-LDFLAGS+= -Wl,--export-all-symbols -Wl,-L\"$(NI_DIR)/Lib\" -Wl,--dll-search-prefix=\"\" \"-Wl,--exclude-symbols,\x7fnidaqmxbase_NULL_THUNK_DATA\"
-LIBS+= -lnidaqmxbase
-ifeq ($(OSTYPE),Cygwin)
-# Cygwin Win32
-NI_DIR?=$(shell cygpath -u "$(NI_WIN_DIR)")
-CFLAGS+= -mcygwin
-ifeq ($(CYGWIN_VIM),no)
-RUBYPATH:=$(shell cygpath -m $(shell ruby -e 'print $$:.join(" ")') | tr '\n' ',')
-SWIGPATH:=$(shell cygpath -m $(SWIGLIB)/ruby $(SWIGLIB) | tr '\n' ',')
-endif
-else
-# non-Cygwin Win32
-NI_DIR?=$(NI_WIN_DIR)
-CFLAGS+= -mno-cygwin
-endif	# end Win32
-NI_DIR:=$(subst /\,,$(subst :\,:/,$(patsubst %\,%/,$(NI_DIR))))
-NI_INC_DIR=$(NI_DIR)/Include
-else
-# non-Win32, non-Mac
-endif
+ifeq ($(OSTYPE),Darwin)
+	# Mac OS/X
+	NI_DIR?=/Applications/National Instruments/NI-DAQmx Base
+	NI_INC_DIR=$(NI_DIR)/includes
+	LIBS+= -framework nidaqmxbase -framework nidaqmxbaselv
+else	# non-Darwin
+	ifeq ($(OS),Windows_NT)
+		# Win32
+		NI_WIN_DIR?=$(PROGRAMFILES)/National Instruments/NI-DAQmx Base
+		NI_WIN_INC_DIR?=$(NI_WIN_DIR)/Include
+		LDFLAGS+= -Wl,--export-all-symbols -Wl,-L\"$(NI_DIR)/Lib\" -Wl,--dll-search-prefix=\"\" \"-Wl,--exclude-symbols,\x7fnidaqmxbase_NULL_THUNK_DATA\"
+		LIBS+= -lnidaqmxbase
+		ifeq ($(OSTYPE),Cygwin)
+			# Cygwin Win32
+			NI_DIR?=$(shell cygpath -u "$(NI_WIN_DIR)")
+			CFLAGS+= -mcygwin
+			ifeq ($(CYGWIN_VIM),no)
+				RUBYPATH:=$(shell cygpath -m $(shell ruby -e 'print $$:.join(" ")') | tr '\n' ',')
+				SWIGPATH:=$(shell cygpath -m $(SWIGLIB)/ruby $(SWIGLIB) | tr '\n' ',')
+			endif	# not CYGWIN_VIM
+		else	# OSTYPE not Cygwin, but still Win32
+			NI_DIR?=$(NI_WIN_DIR)
+			CFLAGS+= -mno-cygwin
+		endif	# OSTYPE Cygwin
+		NI_DIR:=$(subst /\,,$(subst :\,:/,$(patsubst %\,%/,$(NI_DIR))))
+		NI_INC_DIR=$(NI_DIR)/Include
+	else # OS not Windows_NT, not Darwin either
+	endif # OS Windows_NT
+endif # OSTYPE Darwin
 
 # quote spaces
 NI_DIR:=$(subst /\,,$(patsubst %,%\,$(NI_DIR)/))
@@ -146,4 +145,4 @@ debug: $(BUNDLE) testload.rb .gdbinit
 	echo >>$@ "handle SIGABRT stop"
 	gdb -x $@ $(RUBY)
 
-# vim: filetype=make
+# vim: ft=make ts=2 sw=2

@@ -42,22 +42,15 @@ static VALUE dmxWarning = Qnil;
 
 int32 handle_DAQmx_error(int32 errCode)
 {
-  static const char errorSeparator[] = "ERROR : ";
-  static const char warningSeparator[] = "WARNING : ";
-  static const char *separator;
   size_t errorBufferSize;
-  size_t prefixLength;
   char *errorBuffer;
 
   if (errCode == 0)
     return 0;
 
-  separator = errCode < 0 ? errorSeparator : warningSeparator;
   errorBufferSize = (size_t)DAQmxBaseGetExtendedErrorInfo(NULL, 0);
-  prefixLength = strlen(separator);
-  errorBuffer = malloc(prefixLength + errorBufferSize);
-  strcat(errorBuffer, separator);
-  DAQmxBaseGetExtendedErrorInfo(errorBuffer + prefixLength, (uInt32)errorBufferSize);
+  errorBuffer = malloc(errorBufferSize+1);
+  DAQmxBaseGetExtendedErrorInfo(errorBuffer, (uInt32)errorBufferSize);
 
   if (errCode < 0)
   {
