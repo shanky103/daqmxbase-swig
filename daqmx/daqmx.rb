@@ -57,8 +57,9 @@ module USB600x
 
     def done?
       return true if state != Active 
-      @state = Inactive if isDone = self.is_task_done
-      isDone
+      (errCode, isDone) = self.is_task_done
+      @state = Inactive if isDone == 1
+      isDone == 1
     end
 
     attr_reader :state
@@ -71,11 +72,11 @@ module USB600x
     end
 
     def reset
-      reset_device(@deviceName)
+      Daqmxbase::reset_device(@deviceName)
     end
 
     def serialNumber
-      (errorCode, serno) = get_dev_serial_num(@deviceName)
+      (errorCode, serno) = Daqmxbase::get_dev_serial_num(@deviceName)
       serno
     end
 

@@ -8,7 +8,7 @@ class Efield
   INT_OSC = 12; INT_OSC_AFTER_R = 13; INT_GND = 14; RESERVED=15
   # misc
   MIN_LEVEL = 0.0 # V
-  MAX_LEVEL = 2.0 # V
+  MAX_LEVEL = 10.0 # V
   TIMEOUT = 1.0
   SAMPLES_TO_AVERAGE = 10
   SAMPLE_RATE = 600.0
@@ -33,16 +33,20 @@ class Efield
   def createDOTask
     task = USB600x::Task.new()
     task.create_dochan(doChanName)
+    task.start
     task
   end
 
   def readRawChannelLevel(channelAddress)
     (errCode, sampsWritten) = @digitalOutputTask.write_digital_u8(1, 0, TIMEOUT, Daqmxbase::VAL_GROUP_BY_CHANNEL, channelAddress)
-    p [ errCode, sampsWritten ]
+    p [ sampsWritten, @digitalOutputTask.done? ]
     # read all the samples; wait till done
+    @analogInputTask.start
     (errorCode, data, samplesPerChanRead) =  @analogInputTask.read_analog_f64(Daqmxbase::VAL_AUTO, TIMEOUT, Daqmxbase::VAL_GROUP_BY_CHANNEL, SAMPLES_TO_AVERAGE)
+    p [ data, samplesPerChanRead, @analogInputTask.done? ]
+    @analogInputTask.stop
     if SAMPLES_TO_AVERAGE > 1
-      return data.inject(0) { |s,i| s + i} / data.size
+      return data.inject(0.0) { |s,i| s + i} / data.size
     else
       return data[0]
     end
@@ -61,6 +65,7 @@ class Efield
     @selectOutputs = "port0/line0:3"
     @analogInputTask = createAITask()
     @digitalOutputTask = createDOTask()
+    Daqmxbase::reset_device(@devName)
   end
 
   def references
@@ -69,11 +74,8 @@ class Efield
   end
 end
 
-begin
 ef = Efield.new
-p ef.references
+(0..14).each { |cn| lev = ef.readRawChannelLevel(cn)
+  p [ cn, lev ]
+}
 
-rescue Exception => e
-  $stderr.print(e.to_str)
-  raise
-end
