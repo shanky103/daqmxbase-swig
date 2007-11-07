@@ -27,7 +27,6 @@ SWIG?=swig
 # TODO: how to find for WinNT distro?
 SWIGLIB?=$(shell $(SWIG) -swiglib)
 RUBY?=ruby
-CYGWIN_VIM?=no
 
 # for .vimrc:
 #
@@ -35,6 +34,7 @@ RUBYPATH?=$(shell ruby -e 'print $$:.join(",")')
 SWIGPATH?=$(SWIGLIB)/ruby,$(SWIGLIB)
 
 ifeq ($(OS),Windows_NT) # Win32
+	CYGWIN_VIM?=no
 	NI_WIN_DIR?=$(PROGRAMFILES)/National Instruments/NI-DAQmx Base
 	NI_WIN_INC_DIR?=$(NI_WIN_DIR)/Include
 	LDFLAGS+= -Wl,--export-all-symbols -Wl,-L\"$(NI_DIR)/Lib\" -Wl,--dll-search-prefix=\"\" \"-Wl,--exclude-symbols,\x7fnidaqmxbase_NULL_THUNK_DATA\" --enable-extra-pe-debug 
@@ -60,6 +60,7 @@ else # not Windows_NT
 		# Mac OS/X
 		NI_DIR?=/Applications/National Instruments/NI-DAQmx Base
 		NI_INC_DIR=$(NI_DIR)/includes
+		NI_HEADER:=$(NI_INC_DIR)/NIDAQmxBase.h
 		LIBS+= -framework nidaqmxbase -framework nidaqmxbaselv
 	else # OS not Windows_NT, not Darwin either
 	endif # OSTYPE Darwin

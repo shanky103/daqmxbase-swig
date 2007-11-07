@@ -94,7 +94,6 @@ static void handle_DAQmx_error(int32 errCode)
     // *** BEGIN typemap(in) (<T> writeArray[])
     long len = 1;
     long i;
-    $1_basetype val;
     $1 = calloc(len, sizeof($1_basetype));
 
     switch (rb_type($input))
@@ -104,6 +103,7 @@ static void handle_DAQmx_error(int32 errCode)
         $1 = realloc($1, sizeof($1_basetype)*(size_t)len);
         for (i = 0; i < len; i++)
         {
+          $1_basetype val;
           VALUE v;
           v = rb_ary_entry($input, i);
           switch (rb_type(v))
@@ -128,15 +128,15 @@ static void handle_DAQmx_error(int32 errCode)
         break;
 
       case T_FIXNUM:
-        val = ($1_basetype)NUM2LONG($input);
+        $1[0] = ($1_basetype)NUM2LONG($input);
         break;
 
       case T_BIGNUM:
-        val = ($1_basetype)NUM2ULONG($input);
+        $1[0] = ($1_basetype)NUM2ULONG($input);
         break;
 
       case T_FLOAT:
-        val = ($1_basetype)RFLOAT($input)->value;
+        $1[0] = ($1_basetype)RFLOAT($input)->value;
         break;
 
   Error:

@@ -18,15 +18,17 @@ autoStart = 0
 outData = (0..255).to_a
 
 begin
-  task = Daqmxbase::Task.new(nil)
+  task = Daqmxbase::Task.new()
   task.create_dochan(chan);
   task.start()
 
-  while true do
-    task.write_digital_scalar_u32(autoStart, timeout, 0x00)
-    task.write_digital_scalar_u32(autoStart, timeout, 0xFF)
-    task.write_digital_u8(numSampsPerChan, autoStart, timeout, fillMode, outData)
-    task.write_digital_u32(numSampsPerChan, autoStart, timeout, fillMode, outData)
+  while true
+    (0..7).to_a.collect { |n| 2**n }.each  do |n|
+    task.write_digital_scalar_u32(autoStart, timeout, n)
+#    task.write_digital_scalar_u32(autoStart, timeout, 0xFF)
+#    task.write_digital_u8(numSampsPerChan, autoStart, timeout, fillMode, outData)
+#    task.write_digital_u32(numSampsPerChan, autoStart, timeout, fillMode, outData)
+    end
   end
 
   puts("")
