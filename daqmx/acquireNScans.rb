@@ -1,46 +1,25 @@
-# Ruby Example program:
-#    acquireNScans.rb
+# $Id$
 #
-# Example Category:
-#    AI
+# acquireNScans.rb: sample program to do multi-channel multi-sample
+# analog input
 #
-# Description:
-#    This example demonstrates how to acquire a finite amount of data
-#    using the DAQ device's internal clock.
+# ruby-daqmxbase: A SWIG interface for Ruby and the NI-DAQmx Base data
+# acquisition library.
+# 
+# Copyright (C) 2007 Ned Konz
+# 
+# Licensed under the Apache License, Version 2.0 (the "License"); you
+# may not use this file except in compliance with the License.  You may
+# obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.  See the License for the specific language governing
+# permissions and limitations under the License.
 #
-# Instructions for Running:
-#    1. Select the physical channel to correspond to where your signal
-#       is input on the DAQ device.
-#    2. Enter the minimum and maximum voltage range.
-#       Note: For better accuracy try to match the input range to the
-#       expected voltage level of the measured signal.
-#    3. Set the number of samples to acquire per channel.
-#    4. Set the rate of the acquisiton.
-#       Note: The rate should be AT LEAST twice as fast as the maximum
-#       frequency component of the signal being acquired.
-#
-# Steps:
-#    1. Create a task.
-#    2. Create an analog input voltage channel.
-#    3. Set the rate for the sample clock. Additionally, define the
-#       sample mode to be finite.
-#    4. Call the Start function to start the acquistion.
-#    5. Read all of the waveform data.
-#    6. Call the Clear Task function to stop the acquistion.
-#    7. Display an error if any.
-#
-# I/O Connections Overview:
-#    Make sure your signal input terminal matches the Physical Channel
-#    I/O Control. In this case wire your signal to the ai0 pin on your
-#    DAQ Device. By default, this will also be the signal used as the
-#    analog start trigger.
-#
-# Recommended use:
-#    Call Configure and Start functions.
-#    Call Read function.
-#    Call Stop function at the end.
-#
-
 $suppressStderr = false
 
 BEGIN { $stderr.reopen("/dev/null") if $suppressStderr }

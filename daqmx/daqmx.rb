@@ -9,12 +9,77 @@ require 'daqmxbase'
 # Dev1/port0/line0:3 (4 bits)
 # Dev1/ctr0
 
-class DAQmx
-include Daqmxbase
+module USB600x
+  include Daqmxbase
+
+  class ChannelConfig
+  end
+
+  class AnalogInputChannelConfig < ChannelConfig
+  end
+
+  class AnalogOutputChannelConfig < ChannelConfig
+  end
+
+  class DigitalIOChannelConfig < ChannelConfig
+  end
+
+  # event input counting (falling edge only on PI0)
+  class CtrInputChannelConfig < ChannelConfig
+  end
+
+  class Task < Daqmxbase::Task
+    # task states
+    Uncommitted = 0 # no channels created
+    Committed = 1   # channels created
+    Inactive = 2    # not started yet, or finished
+    Active = 3      # started
+
+    def initialize(taskName = nil)
+      super
+      @state = Uncommitted
+    end
+
+    def clear
+      super
+      @state = Uncommitted
+    end
+
+    def start
+      super
+      @state = Active
+    end
+
+    def stop
+      super
+      @state = Inactive
+    end
+
+    def done?
+      return true if state != Active 
+      @state = Inactive if isDone = self.is_task_done
+      isDone
+    end
+
+    attr_reader :state
+
+  end
+
+  class Device
+    def initialize(deviceName = "Dev1")
+      @deviceName = deviceName
+    end
+
+    def reset
+      reset_device(@deviceName)
+    end
+
+    def serialNumber
+      (errorCode, serno) = get_dev_serial_num(@deviceName)
+      serno
+    end
+
+    attr_reader :deviceName
+  end
 
 end
-
-p DAQmx.ancestors
-p DAQmx.instance_methods - Class.instance_methods
-p DAQmx.methods - Class.methods
-p DAQmx.constants.reject { |c| /^(ERROR_|WARNING_|VAL_)/.match(c) }
