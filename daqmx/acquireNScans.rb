@@ -73,7 +73,7 @@ fillMode = Daqmxbase::VAL_GROUP_BY_CHANNEL # or Daqmxbase::VAL_GROUP_BY_SCAN_NUM
 bufferSize = 80
 
 begin
-  task = Daqmxbase::Task.new(nil)
+  task = Daqmxbase::Task.new()
   task.create_aivoltage_chan(chan, terminalConfig, min, max, units) 
   task.cfg_samp_clk_timing(source, sampleRate, activeEdge, sampleMode, samplesPerChan)
   task.start()

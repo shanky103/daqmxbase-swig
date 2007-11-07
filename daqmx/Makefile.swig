@@ -37,7 +37,7 @@ SWIGPATH?=$(SWIGLIB)/ruby,$(SWIGLIB)
 ifeq ($(OS),Windows_NT) # Win32
 	NI_WIN_DIR?=$(PROGRAMFILES)/National Instruments/NI-DAQmx Base
 	NI_WIN_INC_DIR?=$(NI_WIN_DIR)/Include
-	LDFLAGS+= -Wl,--export-all-symbols -Wl,-L\"$(NI_DIR)/Lib\" -Wl,--dll-search-prefix=\"\" \"-Wl,--exclude-symbols,\x7fnidaqmxbase_NULL_THUNK_DATA\"
+	LDFLAGS+= -Wl,--export-all-symbols -Wl,-L\"$(NI_DIR)/Lib\" -Wl,--dll-search-prefix=\"\" \"-Wl,--exclude-symbols,\x7fnidaqmxbase_NULL_THUNK_DATA\" --enable-extra-pe-debug 
 	LIBS+= -lnidaqmxbase
 	OSTYPE?=$(shell uname -o)
 	NI_INC_DIR=$(NI_DIR)/Include

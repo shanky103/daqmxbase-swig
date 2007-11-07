@@ -78,171 +78,6 @@ static int32 handle_DAQmx_error(int32 errCode)
 %apply  char *OUTPUT { char errorString[] };
 %apply  float *OUTPUT { float64 *value };
 
-// Allow passing Ruby array or just single (float or fix) number
-%typemap(in) float64 writeArray[],
-             uInt8 writeArray[],
-             uInt32 writeArray[]
-{
-  // *** BEGIN typemap(in) (<T> writeArray[])
-  long len = 1;
-  long i;
-  $1_basetype val;
-  $1 = calloc(len, sizeof($1_basetype));
-
-  switch (rb_type($input))
-  {
-    case T_ARRAY:
-      len = RARRAY($input)->len;
-      $1 = realloc($1, sizeof($1_basetype)*(size_t)len);
-      for (i = 0; i < len; i++)
-      {
-        VALUE v;
-        v = rb_ary_entry($input, i);
-        switch (rb_type(v))
-        {
-          case T_FIXNUM:
-            val = ($1_basetype)FIX2LONG(v);
-            break;
-
-          case T_FLOAT:
-            val = ($1_basetype)RFLOAT(v)->value;
-            break;
-
-          default:
-            goto Error;
-        };
-        $1[i] = val;
-      }
-      break;
-
-    case T_FIXNUM:
-      val = ($1_basetype)FIX2LONG($input);
-      break;
-
-    case T_FLOAT:
-      val = ($1_basetype)RFLOAT($input)->value;
-      break;
-
-Error:
-    default:
-      free($1);
-      $1 = NULL;
-      rb_raise(rb_eTypeError, "writeArray must be FIXNUM, float, or array of float or fixnum");
-      break;
-  };
-  // *** END typemap(in) (<T> writeArray[])
-};
-
-// free array allocated by above
-%typemap(freearg) (float64 writeArray[]) {
-  // *** typemap(freearg) (float64 writeArray[])
-  if ($1) free($1);
-};
-
-// ruby size param in: alloc array of given size
-%typemap(in) (float64 readArray[], uInt32 arraySizeInSamps),
-             (uInt8 readArray[], uInt32 arraySizeInSamps),
-             (uInt16 readArray[], uInt32 arraySizeInSamps),
-             (uInt32 readArray[], uInt32 arraySizeInSamps) {
-  // *** BEGIN typemap(in) (<T> readArray[], uInt32 arraySizeInSamps)
-  long len;
-
-  if (FIXNUM_P($input))
-    len = FIX2LONG($input);
-  else
-    rb_raise(rb_eTypeError, "readArray size must be FIXNUM");
-
-  if (len <= 0)
-    rb_raise(rb_eRangeError, "readArray size must be > 0 (but got %ld)", len);
-
-  $1 = calloc((size_t)len, sizeof($1_basetype));
-  $2 = (uInt32)len;
-  // *** END typemap(in) (<T> readArray[], uInt32 arraySizeInSamps)
-};
-
-// free array allocated by above
-%typemap(freearg) (float64 readArray[], uInt32 arraySizeInSamps),
-             (uInt8 readArray[], uInt32 arraySizeInSamps),
-             (uInt16 readArray[], uInt32 arraySizeInSamps),
-             (uInt32 readArray[], uInt32 arraySizeInSamps) {
-  // *** typemap(freearg) (float64 readArray[], uInt32 arraySizeInSamps)
-  if ($1) free($1);
-};
-
-// make Ruby Array of FIXNUMs
-%typemap(argout) (uInt8 readArray[], uInt32 arraySizeInSamps),
-                 (uInt16 readArray[], uInt32 arraySizeInSamps),
-                 (uInt32 readArray[], uInt32 arraySizeInSamps) {
-  // *** BEGIN typemap(argout) (uIntx readArray[], uInt32 arraySizeInSamps)
-  long i;
-  VALUE data;
-  // result is return val from function
-  if (result != 0)
-  {
-    $result = Qnil;
-    free($1);
-    handle_DAQmx_error(result);
-  }
-
-  // create Ruby array of given length
-  data = rb_ary_new2($2);
-
-  // populate it an element at a time.
-  for (i = 0; i < (long)$2; i++)
-  {
-    rb_ary_store(data, i, ULONG2NUM($1[i]));
-  }
-
-  // $result is what will be passed to Ruby
-  if (rb_type($result) != T_ARRAY)
-  {
-    if ($result != Qnil)
-    {
-      VALUE oldResult = $result;
-      $result = rb_ary_new();
-      rb_ary_push($result, oldResult);
-    }
-  }
-
-  rb_ary_push($result, data);
-  // *** END typemap(argout) (uIntx readArray[], uInt32 arraySizeInSamps)
-};
-
-// make Ruby Array of floats
-%typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps) {
-  // *** BEGIN typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps)
-  long i;
-  VALUE data;
-  // result is return val from function
-  if (result != 0)
-  {
-    $result = Qnil;
-    free($1);
-    handle_DAQmx_error(result);
-  }
-
-  // create Ruby array of given length
-  data = rb_ary_new2($2);
-
-  // populate it an element at a time.
-  for (i = 0; i < (long)$2; i++)
-    rb_ary_store(data, i, rb_float_new($1[i]));
-
-  // $result is what will be passed to Ruby
-  if (rb_type($result) != T_ARRAY)
-  {
-    if ($result != Qnil)
-    {
-      VALUE oldResult = $result;
-      $result = rb_ary_new();
-      rb_ary_push($result, oldResult);
-    }
-  }
-
-  rb_ary_push($result, data);
-  // *** END typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps)
-};
-
 // Note that TaskHandle is typedef'd as uInt32*
 // so here &someTask is equivalent to a TaskHandle.
 %inline{
@@ -251,12 +86,177 @@ Error:
 
 %extend Task {
 
-  // pass string and size to C function
-  %typemap(in) (char *str, int len) {
-    // *** BEGIN typemap(in) (char *str, int len)
-    $1 = STR2CSTR($input);
-    $2 = (int) RSTRING($input)->len;
-    // *** END typemap(in) (char *str, int len)
+  // Allow passing Ruby array or just single (float or fix) number
+  %typemap(in) float64 writeArray[],
+               uInt8 writeArray[],
+               uInt32 writeArray[]
+  {
+    // *** BEGIN typemap(in) (<T> writeArray[])
+    long len = 1;
+    long i;
+    $1_basetype val;
+    $1 = calloc(len, sizeof($1_basetype));
+
+    switch (rb_type($input))
+    {
+      case T_ARRAY:
+        len = RARRAY($input)->len;
+        $1 = realloc($1, sizeof($1_basetype)*(size_t)len);
+        for (i = 0; i < len; i++)
+        {
+          VALUE v;
+          v = rb_ary_entry($input, i);
+          switch (rb_type(v))
+          {
+            case T_FIXNUM:
+              val = ($1_basetype)NUM2LONG(v);
+              break;
+
+            case T_BIGNUM:
+              val = ($1_basetype)NUM2ULONG(v);
+              break;
+
+            case T_FLOAT:
+              val = ($1_basetype)RFLOAT(v)->value;
+              break;
+
+            default:
+              goto Error;
+          };
+          $1[i] = val;
+        }
+        break;
+
+      case T_FIXNUM:
+        val = ($1_basetype)NUM2LONG($input);
+        break;
+
+      case T_BIGNUM:
+        val = ($1_basetype)NUM2ULONG($input);
+        break;
+
+      case T_FLOAT:
+        val = ($1_basetype)RFLOAT($input)->value;
+        break;
+
+  Error:
+      default:
+        free($1);
+        $1 = NULL;
+        rb_raise(rb_eTypeError, "writeArray must be FIXNUM, float, or array of float or fixnum");
+        break;
+    };
+    // *** END typemap(in) (<T> writeArray[])
+  };
+
+  // free array allocated by above
+  %typemap(freearg) (float64 writeArray[]) {
+    // *** typemap(freearg) (float64 writeArray[])
+    if ($1) free($1);
+  };
+
+  // ruby size param in: alloc array of given size
+  %typemap(in) (float64 readArray[], uInt32 arraySizeInSamps),
+               (uInt8 readArray[], uInt32 arraySizeInSamps),
+               (uInt16 readArray[], uInt32 arraySizeInSamps),
+               (uInt32 readArray[], uInt32 arraySizeInSamps) {
+    // *** BEGIN typemap(in) (<T> readArray[], uInt32 arraySizeInSamps)
+    long len;
+
+    if (FIXNUM_P($input))
+      len = FIX2LONG($input);
+    else
+      rb_raise(rb_eTypeError, "readArray size must be FIXNUM");
+
+    if (len <= 0)
+      rb_raise(rb_eRangeError, "readArray size must be > 0 (but got %ld)", len);
+
+    $1 = calloc((size_t)len, sizeof($1_basetype));
+    $2 = (uInt32)len;
+    // *** END typemap(in) (<T> readArray[], uInt32 arraySizeInSamps)
+  };
+
+  // free array allocated by above
+  %typemap(freearg) (float64 readArray[], uInt32 arraySizeInSamps),
+               (uInt8 readArray[], uInt32 arraySizeInSamps),
+               (uInt16 readArray[], uInt32 arraySizeInSamps),
+               (uInt32 readArray[], uInt32 arraySizeInSamps) {
+    // *** typemap(freearg) (float64 readArray[], uInt32 arraySizeInSamps)
+    if ($1) free($1);
+  };
+
+  // make Ruby Array of FIXNUMs
+  %typemap(argout) (uInt8 readArray[], uInt32 arraySizeInSamps),
+                   (uInt16 readArray[], uInt32 arraySizeInSamps),
+                   (uInt32 readArray[], uInt32 arraySizeInSamps) {
+    // *** BEGIN typemap(argout) (uIntx readArray[], uInt32 arraySizeInSamps)
+    long i;
+    VALUE data;
+    // result is return val from function
+    if (result != 0)
+    {
+      $result = Qnil;
+      free($1);
+      handle_DAQmx_error(result);
+    }
+
+    // create Ruby array of given length
+    data = rb_ary_new2($2);
+
+    // populate it an element at a time.
+    for (i = 0; i < (long)$2; i++)
+    {
+      rb_ary_store(data, i, ULONG2NUM($1[i]));
+    }
+
+    // $result is what will be passed to Ruby
+    if (rb_type($result) != T_ARRAY)
+    {
+      if ($result != Qnil)
+      {
+        VALUE oldResult = $result;
+        $result = rb_ary_new();
+        rb_ary_push($result, oldResult);
+      }
+    }
+
+    rb_ary_push($result, data);
+    // *** END typemap(argout) (uIntx readArray[], uInt32 arraySizeInSamps)
+  };
+
+  // make Ruby Array of floats
+  %typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps) {
+    // *** BEGIN typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps)
+    long i;
+    VALUE data;
+    // result is return val from function
+    if (result != 0)
+    {
+      $result = Qnil;
+      free($1);
+      handle_DAQmx_error(result);
+    }
+
+    // create Ruby array of given length
+    data = rb_ary_new2($2);
+
+    // populate it an element at a time.
+    for (i = 0; i < (long)$2; i++)
+      rb_ary_store(data, i, rb_float_new($1[i]));
+
+    // $result is what will be passed to Ruby
+    if (rb_type($result) != T_ARRAY)
+    {
+      if ($result != Qnil)
+      {
+        VALUE oldResult = $result;
+        $result = rb_ary_new();
+        rb_ary_push($result, oldResult);
+      }
+    }
+
+    rb_ary_push($result, data);
+    // *** END typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps)
   };
 
   // pass error code return from DAQmxBase functions to Ruby
@@ -304,7 +304,7 @@ Error:
   };
 
   // if you give a non-empty name, you get LoadTask, else CreateTask.
-  Task(const char taskName[]) {
+  Task(const char *taskName = NULL) {
     Task *t = (Task *)calloc(1, sizeof(Task));
     int32 result;
     if (&taskName[0] == NULL || taskName[0] == '\0')
