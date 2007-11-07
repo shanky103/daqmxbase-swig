@@ -201,19 +201,7 @@ static void handle_DAQmx_error(int32 errCode)
     {
       rb_ary_store(data, i, ULONG2NUM($1[i]));
     }
-
-    // $result is what will be passed to Ruby
-    if (rb_type($result) != T_ARRAY)
-    {
-      if ($result != Qnil)
-      {
-        VALUE oldResult = $result;
-        $result = rb_ary_new();
-        rb_ary_push($result, oldResult);
-      }
-    }
-
-    rb_ary_push($result, data);
+    SWIG_Ruby_AppendOutput($result, data);
     // *** END typemap(argout) (uIntx readArray[], uInt32 arraySizeInSamps)
   };
 
@@ -230,18 +218,7 @@ static void handle_DAQmx_error(int32 errCode)
     for (i = 0; i < (long)$2; i++)
       rb_ary_store(data, i, rb_float_new($1[i]));
 
-    // $result is what will be passed to Ruby
-    if (rb_type($result) != T_ARRAY)
-    {
-      if ($result != Qnil)
-      {
-        VALUE oldResult = $result;
-        $result = rb_ary_new();
-        rb_ary_push($result, oldResult);
-      }
-    }
-
-    rb_ary_push($result, data);
+    SWIG_Ruby_AppendOutput($result, data);
     // *** END typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps)
   };
 
