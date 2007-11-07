@@ -33,10 +33,10 @@ begin
 
   while true do
     task.write_digital_scalar_u32(autoStart, timeout, 0x01)
-    (errorCode, nWritten) = task.write_digital_u8(numSampsPerChan, autoStart, timeout, fillMode, outData)
-#    p [ errorCode, numSampsPerChan, nWritten  ]
-    (errorCode, nWritten) = task.write_digital_u32(numSampsPerChan, autoStart, timeout, fillMode, outData)
-#    p [ errorCode, numSampsPerChan, nWritten  ]
+    nWritten = task.write_digital_u8(numSampsPerChan, autoStart, timeout, fillMode, outData)
+#    p [ numSampsPerChan, nWritten  ]
+    nWritten = task.write_digital_u32(numSampsPerChan, autoStart, timeout, fillMode, outData)
+#    p [ numSampsPerChan, nWritten  ]
   end
 
   puts("")

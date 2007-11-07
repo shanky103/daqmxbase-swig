@@ -50,7 +50,7 @@ task.start()
 
 now = Time.now
 
-(errorCode, data, sampsPerChanRead) = task.read_analog_f64(numSampsPerChan, timeout, fillMode, arraySizeInSamps) 
+(data, sampsPerChanRead) = task.read_analog_f64(numSampsPerChan, timeout, fillMode, arraySizeInSamps) 
 
 puts("elapsed: #{Time.now - now} seconds")
 printf("Acquired %d samples\n", sampsPerChanRead)

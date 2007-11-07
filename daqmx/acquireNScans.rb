@@ -58,7 +58,7 @@ begin
   task.start()
 
   startTime = Time.now
-  (errorCode, data, samplesPerChanRead) = task.read_analog_f64(numSamplesPerChan, timeout, fillMode, bufferSize)
+  (data, samplesPerChanRead) = task.read_analog_f64(numSamplesPerChan, timeout, fillMode, bufferSize)
   endTime = Time.now
 rescue  Exception => e
   $stderr.reopen($stdout) if $suppressStderr
@@ -66,5 +66,5 @@ rescue  Exception => e
 else
  $stderr.reopen($stdout) if $suppressStderr
  p data
- $stdout.puts "error #{errorCode}, read #{samplesPerChanRead}, total time: #{endTime - startTime}, rate: #{samplesPerChanRead/(endTime-startTime)}"
+ $stdout.puts "read #{samplesPerChanRead}, total time: #{endTime - startTime}, rate: #{samplesPerChanRead/(endTime-startTime)}"
 end

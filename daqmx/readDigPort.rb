@@ -21,14 +21,14 @@ begin
   task.create_dichan(chan);
   task.start()
 
-  (errorCode, data) = task.read_digital_scalar_u32(timeout)
+  data = task.read_digital_scalar_u32(timeout)
   printf("read_digital_scalar_u32: 0x%x\n", data)
 
-  (errorCode, data, sampsPerChanRead) = task.read_digital_u32(numSampsPerChan, timeout, fillMode, bufferSize)
+  (data, sampsPerChanRead) = task.read_digital_u32(numSampsPerChan, timeout, fillMode, bufferSize)
   printf("read_digital_u32 read %d samps/chan: ", sampsPerChanRead)
   data.each { |d| printf(" 0x%x", d) }
 
-  (errorCode, data, sampsPerChanRead) = task.read_digital_u8(numSampsPerChan, timeout, fillMode, bufferSize)
+  (data, sampsPerChanRead) = task.read_digital_u8(numSampsPerChan, timeout, fillMode, bufferSize)
   printf("\nread_digital_u8 read %d samps/chan: ", sampsPerChanRead)
   data.each { |d| printf(" 0x%x", d) }
   puts("")

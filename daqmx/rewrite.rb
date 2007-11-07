@@ -27,6 +27,8 @@
 
 # these calls will not be wrapped, because they're not yet supported.
 $ignored = %w{
+  DAQmxBaseCreateTask
+  DAQmxBaseLoadTask
   }
 puts("// Automatically generated from NIDAQmxBase.h header file.")
 puts("// Do not edit.")
@@ -59,9 +61,11 @@ ARGF.each_line do |line|
     libname = prefix + suffix
     args = $3.gsub(/\s+/,' ').split(/\s*,\s*/)
     callArgs = args.collect { |arg| arg.sub(/.*?(\w+)[^\w]*$/, '\1') }
-    callArgs.delete("taskHandle")
     hasSelf = (args[0] == "TaskHandle taskHandle")
-    args.shift if hasSelf
+    if hasSelf
+      args.shift
+      callArgs.shift
+    end
 
     rubyname = suffix.gsub(/([a-z])([A-Z])/, '\1_\2').downcase
 
@@ -80,14 +84,17 @@ ARGF.each_line do |line|
       puts <<EOF
 %ignore #{libname};
 %extend Task {
-  int32 #{rubyname}(#{args.join(", ")})
-    { return #{libname}(#{callArgs.join(", ")}); }
+  void #{rubyname}(#{args.join(", ")})
+    { handle_DAQmx_error(#{libname}(#{callArgs.join(", ")})); }
 };
 EOF
     else
       puts <<EOF
-%rename(\"#{rubyname}\") #{libname};
-%inline { int32 #{libname}(#{args.join(", ")}); };
+%ignore #{libname};
+%inline {
+  void #{rubyname}(#{args.join(", ")})
+    { handle_DAQmx_error(#{libname}(#{callArgs.join(", ")})); }
+};
 EOF
     end
   end
@@ -95,4 +102,4 @@ end
 
 puts("// " + "vim: ft=swig")
 
-# vim: set ft=ruby ai ts=2 sw=2 et
+# vim: ft=ruby ai ts=2 sw=2 et

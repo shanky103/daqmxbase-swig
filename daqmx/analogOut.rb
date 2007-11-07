@@ -48,11 +48,11 @@ begin
 
   while true
     startTime = Time.now
-    (errorCode, samplesPerChanRead) = task.write_analog_f64(samplesPerChan,
+    (samplesPerChanRead) = task.write_analog_f64(samplesPerChan,
                 0, timeout, fillMode, data)
     endTime = Time.now
           rate = samplesPerChanRead/(endTime-startTime)
-          $stdout.puts "error #{errorCode}, write #{samplesPerChanRead}, total time: #{endTime - startTime}, rate: #{rate}"
+          $stdout.puts "write #{samplesPerChanRead}, total time: #{endTime - startTime}, rate: #{rate}"
   end
 
 rescue  Exception => e

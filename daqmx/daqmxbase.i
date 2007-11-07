@@ -40,13 +40,13 @@
 static VALUE dmxError = Qnil;
 static VALUE dmxWarning = Qnil;
 
-static int32 handle_DAQmx_error(int32 errCode)
+static void handle_DAQmx_error(int32 errCode)
 {
   size_t errorBufferSize;
   char *errorBuffer;
 
   if (errCode == 0)
-    return 0;
+    return;
 
   errorBufferSize = (size_t)DAQmxBaseGetExtendedErrorInfo(NULL, 0);
   errorBuffer = malloc(errorBufferSize+1);
@@ -64,8 +64,6 @@ static int32 handle_DAQmx_error(int32 errCode)
       dmxWarning = rb_define_class("DAQmxBaseWarning", rb_eRuntimeError);
     rb_raise(dmxWarning, errorBuffer);
   }
-
-  return errCode;
 }
 
 %};
@@ -84,7 +82,9 @@ static int32 handle_DAQmx_error(int32 errCode)
   typedef struct { uInt32 t; } Task;
 };
 
+
 %extend Task {
+  %ignore t;
 
   // Allow passing Ruby array or just single (float or fix) number
   %typemap(in) float64 writeArray[],
@@ -192,13 +192,6 @@ static int32 handle_DAQmx_error(int32 errCode)
     // *** BEGIN typemap(argout) (uIntx readArray[], uInt32 arraySizeInSamps)
     long i;
     VALUE data;
-    // result is return val from function
-    if (result != 0)
-    {
-      $result = Qnil;
-      free($1);
-      handle_DAQmx_error(result);
-    }
 
     // create Ruby array of given length
     data = rb_ary_new2($2);
@@ -229,13 +222,6 @@ static int32 handle_DAQmx_error(int32 errCode)
     // *** BEGIN typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps)
     long i;
     VALUE data;
-    // result is return val from function
-    if (result != 0)
-    {
-      $result = Qnil;
-      free($1);
-      handle_DAQmx_error(result);
-    }
 
     // create Ruby array of given length
     data = rb_ary_new2($2);
