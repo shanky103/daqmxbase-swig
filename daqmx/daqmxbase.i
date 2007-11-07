@@ -191,17 +191,18 @@ static void handle_DAQmx_error(int32 errCode)
                    (uInt32 readArray[], uInt32 arraySizeInSamps) {
     // *** BEGIN typemap(argout) (uIntx readArray[], uInt32 arraySizeInSamps)
     long i;
-    VALUE data;
+    VALUE data, dataWrapper;
 
     // create Ruby array of given length
     data = rb_ary_new2($2);
+    dataWrapper = rb_ary_new2(1);
 
     // populate it an element at a time.
     for (i = 0; i < (long)$2; i++)
-    {
       rb_ary_store(data, i, ULONG2NUM($1[i]));
-    }
-    SWIG_Ruby_AppendOutput($result, data);
+
+    rb_ary_store(dataWrapper, 0, data);
+    $result = SWIG_Ruby_AppendOutput($result, dataWrapper);
     // *** END typemap(argout) (uIntx readArray[], uInt32 arraySizeInSamps)
   };
 
@@ -209,16 +210,18 @@ static void handle_DAQmx_error(int32 errCode)
   %typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps) {
     // *** BEGIN typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps)
     long i;
-    VALUE data;
+    VALUE data, dataWrapper;
 
     // create Ruby array of given length
     data = rb_ary_new2($2);
+    dataWrapper = rb_ary_new2(1);
 
     // populate it an element at a time.
     for (i = 0; i < (long)$2; i++)
       rb_ary_store(data, i, rb_float_new($1[i]));
 
-    SWIG_Ruby_AppendOutput($result, data);
+    rb_ary_store(dataWrapper, 0, data);
+    $result = SWIG_Ruby_AppendOutput($result, dataWrapper);
     // *** END typemap(argout) (float64 readArray[], uInt32 arraySizeInSamps)
   };
 
