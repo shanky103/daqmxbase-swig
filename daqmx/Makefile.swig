@@ -73,7 +73,8 @@ SPACE= #space here
 NI_HEADER:=$(subst /\,,$(patsubst %,%\,$(NI_HEADER)/))
 
 # -debug_typemap -Wall -w322
-SWIG_OPTS+= -v -ruby -Fstandard  -dump_typedef -dump_classes
+# -dump_typedef -dump_classes
+SWIG_OPTS+= -ruby -Fstandard 
 CPPFLAGS+= -I \"$(NI_INC_DIR)\"
 CFLAGS+= -g -Wall -Wno-redundant-decls
 
