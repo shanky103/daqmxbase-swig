@@ -37,7 +37,8 @@ class Efield
   end
 
   def readRawChannelLevel(channelAddress)
-    (errCode, sampsWritten) = @digitalOutputTask.write_digital_u8(1, false, TIMEOUT, Daqmxbase::VAL_GROUP_BY_CHANNEL, channelAddress)
+    (errCode, sampsWritten) = @digitalOutputTask.write_digital_u8(1, 0, TIMEOUT, Daqmxbase::VAL_GROUP_BY_CHANNEL, channelAddress)
+    p [ errCode, sampsWritten ]
     # read all the samples; wait till done
     (errorCode, data, samplesPerChanRead) =  @analogInputTask.read_analog_f64(Daqmxbase::VAL_AUTO, TIMEOUT, Daqmxbase::VAL_GROUP_BY_CHANNEL, SAMPLES_TO_AVERAGE)
     if SAMPLES_TO_AVERAGE > 1
@@ -68,6 +69,11 @@ class Efield
   end
 end
 
+begin
 ef = Efield.new
 p ef.references
 
+rescue Exception => e
+  $stderr.print(e.to_str)
+  raise
+end
