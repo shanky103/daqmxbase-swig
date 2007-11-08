@@ -28,7 +28,6 @@ def testOne
   minVal = -1.0
   maxVal = 1.0
 
-  Daqmxbase::reset_device(deviceName)
   task = Daqmxbase::Task.new
   print "create_aivoltage_chan: "
   p task.create_aivoltage_chan(chan,Daqmxbase::VAL_CFG_DEFAULT,minVal,maxVal,Daqmxbase::VAL_VOLTS)
