@@ -10,7 +10,7 @@ class Efield
   INT_OSC = 12; INT_OSC_AFTER_R = 13; INT_GND = 14; RESERVED=15
   # misc
   MIN_LEVEL = 0.0 # V
-  MAX_LEVEL = 10.0 # V
+  MAX_LEVEL = 2.0 # V
   TIMEOUT = 1.0
   SAMPLES_TO_AVERAGE = 10
   SAMPLE_RATE = 600.0
@@ -25,7 +25,7 @@ class Efield
 
   def createAITask
     task = Task.new()
-    task.create_aivoltage_chan(aiChanName, VAL_RSE, MIN_LEVEL, MAX_LEVEL, VAL_VOLTS)
+    task.create_aivoltage_chan(aiChanName, VAL_DIFF, MIN_LEVEL, MAX_LEVEL, VAL_VOLTS)
     if SAMPLES_TO_AVERAGE > 1
       task.cfg_samp_clk_timing("OnboardClock", SAMPLE_RATE, VAL_RISING, VAL_FINITE_SAMPS, SAMPLES_TO_AVERAGE)
     end
