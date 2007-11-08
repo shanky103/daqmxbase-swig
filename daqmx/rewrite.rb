@@ -1,7 +1,7 @@
 #! ruby
 # rewrite.rb: Prepares SWIG declarations from NIDAQmxBase.h
 # $Id$
-
+#-----------------------------------------------------------------------
 # ruby-daqmxbase: A SWIG interface for Ruby and the NI-DAQmx Base data
 # acquisition library.
 # 
@@ -18,6 +18,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
 # implied.  See the License for the specific language governing
 # permissions and limitations under the License.
+#-----------------------------------------------------------------------
 
 # Does a few things:
 # * generates %rename statements for the constants

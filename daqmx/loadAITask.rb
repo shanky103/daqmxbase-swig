@@ -1,35 +1,22 @@
-# Ruby example program:
-#    loadAITask.rb
-#
-# Example Category:
-#    AI & Task Loading
-#
-# Description:
-#    This example demonstrates how to load a task created with the
-#    NI-DAQmx Base Task Configuration Utility.
-#
-# Instructions for Running:
-#    1. Run the NI-DAQmx Base Task Configuration Utility executable.
-#    2  Create/modify a task.
-#    3. Select the created/modified task to load.
-#
-# Steps:
-#    1. Load a task.
-#    2. Start the task.
-#    3. Use the Read function to read data from the task.
-#       Set a timeout so an error is returned if the sample is
-#       not returned in the specified time limit.
-#    4. Stop the task.
-#    5. Display an error if any.
-#
-# I/O Connections Overview:
-#    Make sure your input and output signals match the
-#    created/modified task.
-#
-# Recommended Use:
-#    Loading a specialized task that was created using the
-#    NI-DAQmx Base Task Configuration Utility.
-#
+# $Id$
+#-----------------------------------------------------------------------
+# ruby-daqmxbase: A SWIG interface for Ruby and the NI-DAQmx Base data
+# acquisition library.
+# 
+# Copyright (C) 2007 Ned Konz
+# 
+# Licensed under the Apache License, Version 2.0 (the "License"); you
+# may not use this file except in compliance with the License.  You may
+# obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.  See the License for the specific language governing
+# permissions and limitations under the License.
+#-----------------------------------------------------------------------
 
 require 'daqmxbase'
 

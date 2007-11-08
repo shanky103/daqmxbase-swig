@@ -2,7 +2,7 @@
 #
 # acquireNScans.rb: sample program to do multi-channel multi-sample
 # analog input
-#
+#-----------------------------------------------------------------------
 # ruby-daqmxbase: A SWIG interface for Ruby and the NI-DAQmx Base data
 # acquisition library.
 # 
@@ -19,6 +19,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
 # implied.  See the License for the specific language governing
 # permissions and limitations under the License.
+#-----------------------------------------------------------------------
 #
 $suppressStderr = false
 
