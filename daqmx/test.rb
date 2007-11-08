@@ -34,7 +34,7 @@ def testOne
   print "start: "
   p task.start()
   print "read_analog_f64: " 
-  p task.read_analog_f64(points_to_read, timeout, Daqmxbase::VAL_GROUP_BY_SCAN_NUMBER, samples_per_chan)
+  p task.read_analog_f64(Daqmxbase::VAL_AUTO, timeout, Daqmxbase::VAL_GROUP_BY_SCAN_NUMBER, samples_per_chan * points_to_read)
   puts "done"
 end
 

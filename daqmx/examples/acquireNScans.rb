@@ -31,11 +31,11 @@ require 'daqmxbase'
 task = nil
 
 # Channel parameters
-chan = "Dev1/ai0"	# all 8 single-ended channels
+chan = "Dev1/ai0:7"	# all 8 single-ended channels
 # terminalConfig = Daqmxbase::VAL_CFG_DEFAULT # differential
 terminalConfig = Daqmxbase::VAL_RSE # single-ended
-min = 0
-max = 10.0
+min = 0.0
+max = 5.0
 units = Daqmxbase::VAL_VOLTS
 
 # Timing parameters
@@ -46,8 +46,8 @@ sampleMode = Daqmxbase::VAL_FINITE_SAMPS
 samplesPerChan = 10
 
 # Data read parameters
-# numSamplsPerChan = Daqmxbase::VAL_CFG_DEFAULT # will wait and then acquire
-numSamplesPerChan = 100
+numSamplesPerChan = Daqmxbase::VAL_CFG_DEFAULT # will wait and then acquire
+# numSamplesPerChan = 100
 timeout = 10.0
 fillMode = Daqmxbase::VAL_GROUP_BY_CHANNEL # or Daqmxbase::VAL_GROUP_BY_SCAN_NUMBER
 bufferSize = 80
