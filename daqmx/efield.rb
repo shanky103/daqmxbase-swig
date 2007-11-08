@@ -41,11 +41,11 @@ class Efield
 
   def readRawChannelLevel(channelAddress)
     sampsWritten = @digitalOutputTask.write_digital_u8(1, 0, TIMEOUT, VAL_GROUP_BY_CHANNEL, channelAddress)
-    p [ sampsWritten, @digitalOutputTask.is_task_done ]
+    p [ "wdu8", sampsWritten, @digitalOutputTask.is_task_done ]
     # read all the samples; wait till done
     @analogInputTask.start
     (data, samplesPerChanRead) =  @analogInputTask.read_analog_f64(VAL_AUTO, TIMEOUT, VAL_GROUP_BY_CHANNEL, SAMPLES_TO_AVERAGE)
-    p [ data, samplesPerChanRead, @analogInputTask.is_task_done ]
+    p [ "raf64", data, samplesPerChanRead, @analogInputTask.is_task_done ]
     @analogInputTask.stop
     if SAMPLES_TO_AVERAGE > 1
       return data.inject(0.0) { |s,i| s + i} / data.size
