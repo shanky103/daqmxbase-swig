@@ -3,10 +3,7 @@
 # efield.rb: drive the channel select  lines of a MC33794 eval board and
 # sample the levels.
 #
-# Unfortunately, the turnaround between the digital and analog causes
-# this to go about 300msec/chan max speed.
-#
-# But it's a working example anyway.
+# Changed to sample continuously.
 #--------------------------------------------------------------------------------
 # ruby-daqmxbase: A SWIG interface for Ruby and the NI-DAQmx Base data
 # acquisition library.
@@ -41,16 +38,19 @@ class Efield
   # misc
   MIN_LEVEL = 0.0 # V
   MAX_LEVEL = 5.0 # V
-  TIMEOUT = 10.0
-  SAMPLES_TO_AVERAGE = 100
-  SAMPLE_RATE = 6000
+
+  SAMPLES_TO_AVERAGE = 200 # Shouldn't be more than 512
+  SAMPLE_RATE = 60 * SAMPLES_TO_AVERAGE   # can't be more than 48KHz or so
+
+  TIMEOUT = 0.5
 
   def createAITask
     task = Task.new()
     task.create_aivoltage_chan(@devName+"/"+@levelInput, VAL_DIFF, MIN_LEVEL, MAX_LEVEL, VAL_VOLTS)
-    if SAMPLES_TO_AVERAGE > 1
-      task.cfg_samp_clk_timing("OnboardClock", SAMPLE_RATE, VAL_RISING, VAL_FINITE_SAMPS, SAMPLES_TO_AVERAGE)
-    end
+    # configure for continuous sampling; must do a read before changing
+    # channels.
+    task.cfg_samp_clk_timing("OnboardClock", SAMPLE_RATE, VAL_RISING, VAL_CONT_SAMPS, 0)
+    task.start
     task
   end
 
@@ -62,13 +62,25 @@ class Efield
   end
 
   def readRawChannelLevel(channelAddress)
-    @digitalOutputTask.write_digital_scalar_u32(0, TIMEOUT, channelAddress)
+    # don't re-write the same address
+    if @lastAddress != channelAddress
+      @changedAddressAt = Time.now
+      @digitalOutputTask.write_digital_scalar_u32(0, TIMEOUT, channelAddress)
+      @lastAddress = channelAddress
+    end
+    # ensure that the last SAMPLES_TO_AVERAGE samples came from the
+    # current channel
+    sleepyTime = (SAMPLES_TO_AVERAGE / SAMPLE_RATE) - (Time.now - @changedAddressAt)
+    if sleepyTime > 0
+      printf("sleep %f\n", sleepyTime)
+      sleep(sleepyTime)
+    end
     # read all the samples; wait till done
-    @analogInputTask.start
     (data, samplesPerChanRead) =
-    @analogInputTask.read_analog_f64(VAL_AUTO, TIMEOUT,
-      VAL_GROUP_BY_CHANNEL, SAMPLES_TO_AVERAGE)
-    @analogInputTask.stop
+      @analogInputTask.read_analog_f64(SAMPLES_TO_AVERAGE, TIMEOUT, VAL_GROUP_BY_CHANNEL, SAMPLES_TO_AVERAGE)
+    if samplesPerChanRead != SAMPLES_TO_AVERAGE
+      printf("got %d, asked for %d\n", samplesPerChanRead, SAMPLES_TO_AVERAGE)
+    end
     retval = data.inject(0.0) { |s,i| s + i} / data.size  # average
     if channelAddress == REF_A
       @refA = retval
@@ -99,6 +111,8 @@ class Efield
     @selectOutputs = "port0"
     @analogInputTask = createAITask()
     @digitalOutputTask = createDOTask()
+    @changedAddressAt = nil
+    @lastAddress = nil
   end
 
   def references
@@ -107,19 +121,25 @@ class Efield
   end
 
   def self.testRun
+    channelRange = (E5..E7).to_a
     ef = self.new
-    baseline = (E1..E9).to_a.collect { |cn| lev = ef.readRawChannelLevel(cn) }
+    baseline = channelRange.to_a.collect { |cn| lev = ef.readRawChannelLevel(cn) }
     scale = (ef.references[1] - ef.references[0]) / 46 # pf
     min = ef.references[0]
     baseline = baseline.collect { |v| v - min }
 
-    while true
-      values = (E1..E9).to_a.collect { |cn| lev = ef.readRawChannelLevel(cn) - min }
-      diffs = values.zip(baseline).collect { |a| diff = (a[0] - a[1]) / scale }
-      diffs.each { |d| printf "% 6.3f ", d }
-      print "\r"
-      $stdout.flush
+    started = Time.now
+    totalSamples = 0
+    now = nil
+    File.open("efield.csv", 'w') do |outfile|
+      while (now = Time.now) - started < 10.0
+        values = channelRange.to_a.collect { |cn| lev = ef.readRawChannelLevel(cn) - min }
+        diffs = values.zip(baseline).collect { |a| diff = (a[0] - a[1]) / scale }
+        outfile.puts((diffs.collect {|d| "%6.4f"% d }.push(totalSamples.to_s)).join(","))
+        totalSamples = totalSamples + channelRange.size
+      end
     end
+    puts "\nelapsed: #{now-started} samples: #{totalSamples} rate: #{totalSamples/(now-started)}"
   end
 end
 
