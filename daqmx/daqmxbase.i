@@ -31,6 +31,7 @@
 %{
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "ruby.h"
 
 // patch typo in v2.20f header file
@@ -42,30 +43,39 @@ static VALUE dmxWarning = Qnil;
 
 static void handle_DAQmx_error(int32 errCode)
 {
-  size_t errorBufferSize;
-  char *errorBuffer;
+  size_t errorBufferSize, prefixSize;
+  char *errorBuffer, *prefixEnd;
+  VALUE exc;
 
   if (errCode == 0)
     return;
 
   errorBufferSize = (size_t)DAQmxBaseGetExtendedErrorInfo(NULL, 0);
-  errorBuffer = malloc(errorBufferSize+1);
-  DAQmxBaseGetExtendedErrorInfo(errorBuffer, (uInt32)errorBufferSize);
+  errorBufferSize += 30; // add room for prefix (10+length of %ld)
+  errorBuffer = malloc(errorBufferSize);
+  snprintf(errorBuffer, errorBufferSize,
+    ((errCode < 0) ? "Error %ld: " : "Warning %ld:"), errCode);
+  prefixSize = strlen(errorBuffer);
+  prefixEnd = errorBuffer + prefixSize;
 
-  if (errCode < 0)
-  {
-    if (dmxError == Qnil)
-      dmxError = rb_define_class("DAQmxBaseError", rb_eRuntimeError);
-    rb_raise(dmxError, errorBuffer);
-  }
-  else if (errCode > 0)
-  {
-    if (dmxWarning == Qnil)
-      dmxWarning = rb_define_class("DAQmxBaseWarning", rb_eRuntimeError);
-    rb_raise(dmxWarning, errorBuffer);
-  }
+  DAQmxBaseGetExtendedErrorInfo(prefixEnd, (uInt32)(errorBufferSize - prefixSize));
+  exc = rb_exc_new2(((errCode < 0) ? dmxError : dmxWarning), errorBuffer);
+
+  // DEBUG
+  // fputs(errorBuffer, stderr);
+
+  free(errorBuffer);
+  rb_exc_raise(exc);
 }
 
+%};
+
+%init %{
+  // initialize exceptions
+  if (dmxError == Qnil)
+    dmxError = rb_define_class("DAQmxBaseError", rb_eRuntimeError);
+  if (dmxWarning == Qnil)
+    dmxWarning = rb_define_class("DAQmxBaseWarning", rb_eRuntimeError);
 %};
 
 // patch typo in header file
