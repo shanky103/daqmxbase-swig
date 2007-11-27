@@ -61,9 +61,6 @@ static void handle_DAQmx_error(int32 errCode)
   DAQmxBaseGetExtendedErrorInfo(prefixEnd, (uInt32)(errorBufferSize - prefixSize));
   exc = rb_exc_new2(((errCode < 0) ? dmxError : dmxWarning), errorBuffer);
 
-  // DEBUG
-  // fputs(errorBuffer, stderr);
-
   free(errorBuffer);
   rb_exc_raise(exc);
 }
