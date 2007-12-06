@@ -92,10 +92,10 @@ EOF
     else
       puts <<EOF
 %ignore #{libname};
-%inline {
+%inline %{
   void #{rubyname}(#{args.join(", ")})
     { handle_DAQmx_error(#{libname}(#{callArgs.join(", ")})); }
-};
+%}
 EOF
     end
   end

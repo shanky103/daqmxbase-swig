@@ -537,20 +537,20 @@
 #define VAL_SWITCH_TOPOLOGY_2593_DUAL_4X1_TERMINATED_MUX "2593/Dual 4x1 Terminated Mux" // 2593/Dual 4x1 Terminated Mux
 #define VAL_SWITCH_TOPOLOGY_2593_INDEPENDENT "2593/Independent" // 2593/Independent
 %ignore DAQmxBaseResetDevice;
-%inline {
+%inline %{
   void reset_device(const char deviceName[])
     { handle_DAQmx_error(DAQmxBaseResetDevice(deviceName)); }
-};
+%}
 %ignore DAQmxBaseGetExtendedErrorInfo;
-%inline {
+%inline %{
   void get_extended_error_info(char errorString[], uInt32 bufferSize)
     { handle_DAQmx_error(DAQmxBaseGetExtendedErrorInfo(errorString, bufferSize)); }
-};
+%}
 %ignore DAQmxBaseGetDevSerialNum;
-%inline {
+%inline %{
   void get_dev_serial_num(const char device[], uInt32 *data)
     { handle_DAQmx_error(DAQmxBaseGetDevSerialNum(device, data)); }
-};
+%}
 #define SUCCESS (0)
 #define ERROR_INVALID_INSTALLATION (-200683)
 #define ERROR_REF_TRIG_MASTER_SESSION_UNAVAILABLE (-200682)

@@ -39,3 +39,5 @@ end
 
 printDerived(Daqmxbase)
 printDerived(Daqmxbase::Task)
+printDerived(Daqmxbase::Error)
+printDerived(Daqmxbase::Warning)

@@ -38,8 +38,8 @@
 #define  DAQmxReadBinaryI32  DAQmxBaseReadBinaryI32
 #include "NIDAQmxBase.h"
 
-static VALUE dmxError = Qnil;
-static VALUE dmxWarning = Qnil;
+static VALUE dmxError = Qnil;   // Daqmxbase::Error
+static VALUE dmxWarning = Qnil; // Daqmxbase::Warning
 
 static void handle_DAQmx_error(int32 errCode)
 {
@@ -60,9 +60,15 @@ static void handle_DAQmx_error(int32 errCode)
 
   DAQmxBaseGetExtendedErrorInfo(prefixEnd, (uInt32)(errorBufferSize - prefixSize));
   exc = rb_exc_new2(((errCode < 0) ? dmxError : dmxWarning), errorBuffer);
+  rb_iv_set(exc, "@code", LONG2FIX(errCode));
 
   free(errorBuffer);
   rb_exc_raise(exc);
+}
+
+static VALUE dmxErrorCode(VALUE self)
+{
+    return rb_iv_get(self, "@code");
 }
 
 %};
@@ -70,9 +76,16 @@ static void handle_DAQmx_error(int32 errCode)
 %init %{
   // initialize exceptions
   if (dmxError == Qnil)
-    dmxError = rb_define_class("DAQmxBaseError", rb_eRuntimeError);
+  {
+    dmxError = rb_define_class_under(mDaqmxbase, "Error", rb_eRuntimeError);
+    rb_define_method(dmxError, "code", dmxErrorCode, 0);
+  }
+
   if (dmxWarning == Qnil)
-    dmxWarning = rb_define_class("DAQmxBaseWarning", rb_eRuntimeError);
+  {
+    dmxWarning = rb_define_class_under(mDaqmxbase, "Warning", rb_eRuntimeError);
+    rb_define_method(dmxWarning, "code", dmxErrorCode, 0);
+  }
 %};
 
 // patch typo in header file
@@ -85,9 +98,9 @@ static void handle_DAQmx_error(int32 errCode)
 
 // Note that TaskHandle is typedef'd as uInt32*
 // so here &someTask is equivalent to a TaskHandle.
-%inline{
+%inline %{
   typedef struct { uInt32 t; } Task;
-};
+%};
 
 
 %extend Task {
