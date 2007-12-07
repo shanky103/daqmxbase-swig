@@ -303,182 +303,182 @@
 %ignore DAQmxBaseStartTask;
 %extend Task {
   void start()
-    { handle_DAQmx_error(DAQmxBaseStartTask((TaskHandle)(void *)$self)); }
+    { handle_DAQmx_error(DAQmxBaseStartTask((TaskHandle)(void *)self)); }
 };
 %ignore DAQmxBaseStopTask;
 %extend Task {
   void stop()
-    { handle_DAQmx_error(DAQmxBaseStopTask((TaskHandle)(void *)$self)); }
+    { handle_DAQmx_error(DAQmxBaseStopTask((TaskHandle)(void *)self)); }
 };
 %ignore DAQmxBaseClearTask;
 %extend Task {
   void clear()
-    { handle_DAQmx_error(DAQmxBaseClearTask((TaskHandle)(void *)$self)); }
+    { handle_DAQmx_error(DAQmxBaseClearTask((TaskHandle)(void *)self)); }
 };
 %ignore DAQmxBaseIsTaskDone;
 %extend Task {
   void is_task_done(bool32 *isTaskDone)
-    { handle_DAQmx_error(DAQmxBaseIsTaskDone((TaskHandle)(void *)$self, isTaskDone)); }
+    { handle_DAQmx_error(DAQmxBaseIsTaskDone((TaskHandle)(void *)self, isTaskDone)); }
 };
 %ignore DAQmxBaseCreateAIVoltageChan;
 %extend Task {
   void create_aivoltage_chan(const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, const char customScaleName[])
-    { handle_DAQmx_error(DAQmxBaseCreateAIVoltageChan((TaskHandle)(void *)$self, physicalChannel, nameToAssignToChannel, terminalConfig, minVal, maxVal, units, customScaleName)); }
+    { handle_DAQmx_error(DAQmxBaseCreateAIVoltageChan((TaskHandle)(void *)self, physicalChannel, nameToAssignToChannel, terminalConfig, minVal, maxVal, units, customScaleName)); }
 };
 %ignore DAQmxBaseCreateAIThrmcplChan;
 %extend Task {
   void create_aithrmcpl_chan(const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 thermocoupleType, int32 cjcSource, float64 cjcVal, const char cjcChannel[])
-    { handle_DAQmx_error(DAQmxBaseCreateAIThrmcplChan((TaskHandle)(void *)$self, physicalChannel, nameToAssignToChannel, minVal, maxVal, units, thermocoupleType, cjcSource, cjcVal, cjcChannel)); }
+    { handle_DAQmx_error(DAQmxBaseCreateAIThrmcplChan((TaskHandle)(void *)self, physicalChannel, nameToAssignToChannel, minVal, maxVal, units, thermocoupleType, cjcSource, cjcVal, cjcChannel)); }
 };
 %ignore DAQmxBaseCreateAOVoltageChan;
 %extend Task {
   void create_aovoltage_chan(const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, const char customScaleName[])
-    { handle_DAQmx_error(DAQmxBaseCreateAOVoltageChan((TaskHandle)(void *)$self, physicalChannel, nameToAssignToChannel, minVal, maxVal, units, customScaleName)); }
+    { handle_DAQmx_error(DAQmxBaseCreateAOVoltageChan((TaskHandle)(void *)self, physicalChannel, nameToAssignToChannel, minVal, maxVal, units, customScaleName)); }
 };
 %ignore DAQmxBaseCreateDIChan;
 %extend Task {
   void create_dichan(const char lines[], const char nameToAssignToLines[], int32 lineGrouping)
-    { handle_DAQmx_error(DAQmxBaseCreateDIChan((TaskHandle)(void *)$self, lines, nameToAssignToLines, lineGrouping)); }
+    { handle_DAQmx_error(DAQmxBaseCreateDIChan((TaskHandle)(void *)self, lines, nameToAssignToLines, lineGrouping)); }
 };
 %ignore DAQmxBaseCreateDOChan;
 %extend Task {
   void create_dochan(const char lines[], const char nameToAssignToLines[], int32 lineGrouping)
-    { handle_DAQmx_error(DAQmxBaseCreateDOChan((TaskHandle)(void *)$self, lines, nameToAssignToLines, lineGrouping)); }
+    { handle_DAQmx_error(DAQmxBaseCreateDOChan((TaskHandle)(void *)self, lines, nameToAssignToLines, lineGrouping)); }
 };
 %ignore DAQmxBaseCreateCIPeriodChan;
 %extend Task {
   void create_ciperiod_chan(const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 edge, int32 measMethod, float64 measTime, uInt32 divisor, const char customScaleName[])
-    { handle_DAQmx_error(DAQmxBaseCreateCIPeriodChan((TaskHandle)(void *)$self, counter, nameToAssignToChannel, minVal, maxVal, units, edge, measMethod, measTime, divisor, customScaleName)); }
+    { handle_DAQmx_error(DAQmxBaseCreateCIPeriodChan((TaskHandle)(void *)self, counter, nameToAssignToChannel, minVal, maxVal, units, edge, measMethod, measTime, divisor, customScaleName)); }
 };
 %ignore DAQmxBaseCreateCICountEdgesChan;
 %extend Task {
   void create_cicount_edges_chan(const char counter[], const char nameToAssignToChannel[], int32 edge, uInt32 initialCount, int32 countDirection)
-    { handle_DAQmx_error(DAQmxBaseCreateCICountEdgesChan((TaskHandle)(void *)$self, counter, nameToAssignToChannel, edge, initialCount, countDirection)); }
+    { handle_DAQmx_error(DAQmxBaseCreateCICountEdgesChan((TaskHandle)(void *)self, counter, nameToAssignToChannel, edge, initialCount, countDirection)); }
 };
 %ignore DAQmxBaseCreateCIPulseWidthChan;
 %extend Task {
   void create_cipulse_width_chan(const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 startingEdge, const char customScaleName[])
-    { handle_DAQmx_error(DAQmxBaseCreateCIPulseWidthChan((TaskHandle)(void *)$self, counter, nameToAssignToChannel, minVal, maxVal, units, startingEdge, customScaleName)); }
+    { handle_DAQmx_error(DAQmxBaseCreateCIPulseWidthChan((TaskHandle)(void *)self, counter, nameToAssignToChannel, minVal, maxVal, units, startingEdge, customScaleName)); }
 };
 %ignore DAQmxBaseCreateCOPulseChanFreq;
 %extend Task {
   void create_copulse_chan_freq(const char counter[], const char nameToAssignToChannel[], int32 units, int32 idleState, float64 initialDelay, float64 freq, float64 dutyCycle)
-    { handle_DAQmx_error(DAQmxBaseCreateCOPulseChanFreq((TaskHandle)(void *)$self, counter, nameToAssignToChannel, units, idleState, initialDelay, freq, dutyCycle)); }
+    { handle_DAQmx_error(DAQmxBaseCreateCOPulseChanFreq((TaskHandle)(void *)self, counter, nameToAssignToChannel, units, idleState, initialDelay, freq, dutyCycle)); }
 };
 %ignore DAQmxBaseCfgSampClkTiming;
 %extend Task {
   void cfg_samp_clk_timing(const char source[], float64 rate, int32 activeEdge, int32 sampleMode, uInt64 sampsPerChan)
-    { handle_DAQmx_error(DAQmxBaseCfgSampClkTiming((TaskHandle)(void *)$self, source, rate, activeEdge, sampleMode, sampsPerChan)); }
+    { handle_DAQmx_error(DAQmxBaseCfgSampClkTiming((TaskHandle)(void *)self, source, rate, activeEdge, sampleMode, sampsPerChan)); }
 };
 %ignore DAQmxBaseCfgImplicitTiming;
 %extend Task {
   void cfg_implicit_timing(int32 sampleMode, uInt64 sampsPerChan)
-    { handle_DAQmx_error(DAQmxBaseCfgImplicitTiming((TaskHandle)(void *)$self, sampleMode, sampsPerChan)); }
+    { handle_DAQmx_error(DAQmxBaseCfgImplicitTiming((TaskHandle)(void *)self, sampleMode, sampsPerChan)); }
 };
 %ignore DAQmxBaseDisableStartTrig;
 %extend Task {
   void disable_start_trig()
-    { handle_DAQmx_error(DAQmxBaseDisableStartTrig((TaskHandle)(void *)$self)); }
+    { handle_DAQmx_error(DAQmxBaseDisableStartTrig((TaskHandle)(void *)self)); }
 };
 %ignore DAQmxBaseCfgDigEdgeStartTrig;
 %extend Task {
   void cfg_dig_edge_start_trig(const char triggerSource[], int32 triggerEdge)
-    { handle_DAQmx_error(DAQmxBaseCfgDigEdgeStartTrig((TaskHandle)(void *)$self, triggerSource, triggerEdge)); }
+    { handle_DAQmx_error(DAQmxBaseCfgDigEdgeStartTrig((TaskHandle)(void *)self, triggerSource, triggerEdge)); }
 };
 %ignore DAQmxBaseCfgAnlgEdgeStartTrig;
 %extend Task {
   void cfg_anlg_edge_start_trig(const char triggerSource[], int32 triggerSlope, float64 triggerLevel)
-    { handle_DAQmx_error(DAQmxBaseCfgAnlgEdgeStartTrig((TaskHandle)(void *)$self, triggerSource, triggerSlope, triggerLevel)); }
+    { handle_DAQmx_error(DAQmxBaseCfgAnlgEdgeStartTrig((TaskHandle)(void *)self, triggerSource, triggerSlope, triggerLevel)); }
 };
 %ignore DAQmxBaseDisableRefTrig;
 %extend Task {
   void disable_ref_trig()
-    { handle_DAQmx_error(DAQmxBaseDisableRefTrig((TaskHandle)(void *)$self)); }
+    { handle_DAQmx_error(DAQmxBaseDisableRefTrig((TaskHandle)(void *)self)); }
 };
 %ignore DAQmxBaseCfgDigEdgeRefTrig;
 %extend Task {
   void cfg_dig_edge_ref_trig(const char triggerSource[], int32 triggerEdge, uInt32 pretriggerSamples)
-    { handle_DAQmx_error(DAQmxBaseCfgDigEdgeRefTrig((TaskHandle)(void *)$self, triggerSource, triggerEdge, pretriggerSamples)); }
+    { handle_DAQmx_error(DAQmxBaseCfgDigEdgeRefTrig((TaskHandle)(void *)self, triggerSource, triggerEdge, pretriggerSamples)); }
 };
 %ignore DAQmxBaseCfgAnlgEdgeRefTrig;
 %extend Task {
   void cfg_anlg_edge_ref_trig(const char triggerSource[], int32 triggerSlope, float64 triggerLevel, uInt32 pretriggerSamples)
-    { handle_DAQmx_error(DAQmxBaseCfgAnlgEdgeRefTrig((TaskHandle)(void *)$self, triggerSource, triggerSlope, triggerLevel, pretriggerSamples)); }
+    { handle_DAQmx_error(DAQmxBaseCfgAnlgEdgeRefTrig((TaskHandle)(void *)self, triggerSource, triggerSlope, triggerLevel, pretriggerSamples)); }
 };
 %ignore DAQmxBaseReadAnalogF64;
 %extend Task {
   void read_analog_f64(int32 numSampsPerChan, float64 timeout, bool32 fillMode, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
-    { handle_DAQmx_error(DAQmxBaseReadAnalogF64((TaskHandle)(void *)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved)); }
+    { handle_DAQmx_error(DAQmxBaseReadAnalogF64((TaskHandle)(void *)self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved)); }
 };
 %ignore DAQmxBaseReadBinaryI16;
 %extend Task {
   void read_binary_i16(int32 numSampsPerChan, float64 timeout, bool32 fillMode, int16 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
-    { handle_DAQmx_error(DAQmxBaseReadBinaryI16((TaskHandle)(void *)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved)); }
+    { handle_DAQmx_error(DAQmxBaseReadBinaryI16((TaskHandle)(void *)self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved)); }
 };
 %ignore DAQmxBaseReadBinaryI32;
 %extend Task {
   void read_binary_i32(int32 numSampsPerChan, float64 timeout, bool32 fillMode, int32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
-    { handle_DAQmx_error(DAQmxBaseReadBinaryI32((TaskHandle)(void *)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved)); }
+    { handle_DAQmx_error(DAQmxBaseReadBinaryI32((TaskHandle)(void *)self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved)); }
 };
 %ignore DAQmxBaseReadDigitalU8;
 %extend Task {
   void read_digital_u8(int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt8 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
-    { handle_DAQmx_error(DAQmxBaseReadDigitalU8((TaskHandle)(void *)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved)); }
+    { handle_DAQmx_error(DAQmxBaseReadDigitalU8((TaskHandle)(void *)self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved)); }
 };
 %ignore DAQmxBaseReadDigitalU32;
 %extend Task {
   void read_digital_u32(int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
-    { handle_DAQmx_error(DAQmxBaseReadDigitalU32((TaskHandle)(void *)$self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved)); }
+    { handle_DAQmx_error(DAQmxBaseReadDigitalU32((TaskHandle)(void *)self, numSampsPerChan, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved)); }
 };
 %ignore DAQmxBaseReadDigitalScalarU32;
 %extend Task {
   void read_digital_scalar_u32(float64 timeout, uInt32 *value, bool32 *reserved)
-    { handle_DAQmx_error(DAQmxBaseReadDigitalScalarU32((TaskHandle)(void *)$self, timeout, value, reserved)); }
+    { handle_DAQmx_error(DAQmxBaseReadDigitalScalarU32((TaskHandle)(void *)self, timeout, value, reserved)); }
 };
 %ignore DAQmxBaseReadCounterF64;
 %extend Task {
   void read_counter_f64(int32 numSampsPerChan, float64 timeout, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
-    { handle_DAQmx_error(DAQmxBaseReadCounterF64((TaskHandle)(void *)$self, numSampsPerChan, timeout, readArray, arraySizeInSamps, sampsPerChanRead, reserved)); }
+    { handle_DAQmx_error(DAQmxBaseReadCounterF64((TaskHandle)(void *)self, numSampsPerChan, timeout, readArray, arraySizeInSamps, sampsPerChanRead, reserved)); }
 };
 %ignore DAQmxBaseReadCounterU32;
 %extend Task {
   void read_counter_u32(int32 numSampsPerChan, float64 timeout, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved)
-    { handle_DAQmx_error(DAQmxBaseReadCounterU32((TaskHandle)(void *)$self, numSampsPerChan, timeout, readArray, arraySizeInSamps, sampsPerChanRead, reserved)); }
+    { handle_DAQmx_error(DAQmxBaseReadCounterU32((TaskHandle)(void *)self, numSampsPerChan, timeout, readArray, arraySizeInSamps, sampsPerChanRead, reserved)); }
 };
 %ignore DAQmxBaseReadCounterScalarF64;
 %extend Task {
   void read_counter_scalar_f64(float64 timeout, float64 *value, bool32 *reserved)
-    { handle_DAQmx_error(DAQmxBaseReadCounterScalarF64((TaskHandle)(void *)$self, timeout, value, reserved)); }
+    { handle_DAQmx_error(DAQmxBaseReadCounterScalarF64((TaskHandle)(void *)self, timeout, value, reserved)); }
 };
 %ignore DAQmxBaseReadCounterScalarU32;
 %extend Task {
   void read_counter_scalar_u32(float64 timeout, uInt32 *value, bool32 *reserved)
-    { handle_DAQmx_error(DAQmxBaseReadCounterScalarU32((TaskHandle)(void *)$self, timeout, value, reserved)); }
+    { handle_DAQmx_error(DAQmxBaseReadCounterScalarU32((TaskHandle)(void *)self, timeout, value, reserved)); }
 };
 %ignore DAQmxBaseWriteAnalogF64;
 %extend Task {
   void write_analog_f64(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, float64 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved)
-    { handle_DAQmx_error(DAQmxBaseWriteAnalogF64((TaskHandle)(void *)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved)); }
+    { handle_DAQmx_error(DAQmxBaseWriteAnalogF64((TaskHandle)(void *)self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved)); }
 };
 %ignore DAQmxBaseWriteDigitalU8;
 %extend Task {
   void write_digital_u8(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt8 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved)
-    { handle_DAQmx_error(DAQmxBaseWriteDigitalU8((TaskHandle)(void *)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved)); }
+    { handle_DAQmx_error(DAQmxBaseWriteDigitalU8((TaskHandle)(void *)self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved)); }
 };
 %ignore DAQmxBaseWriteDigitalU32;
 %extend Task {
   void write_digital_u32(int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, uInt32 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved)
-    { handle_DAQmx_error(DAQmxBaseWriteDigitalU32((TaskHandle)(void *)$self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved)); }
+    { handle_DAQmx_error(DAQmxBaseWriteDigitalU32((TaskHandle)(void *)self, numSampsPerChan, autoStart, timeout, dataLayout, writeArray, sampsPerChanWritten, reserved)); }
 };
 %ignore DAQmxBaseWriteDigitalScalarU32;
 %extend Task {
   void write_digital_scalar_u32(bool32 autoStart, float64 timeout, uInt32 value, bool32 *reserved)
-    { handle_DAQmx_error(DAQmxBaseWriteDigitalScalarU32((TaskHandle)(void *)$self, autoStart, timeout, value, reserved)); }
+    { handle_DAQmx_error(DAQmxBaseWriteDigitalScalarU32((TaskHandle)(void *)self, autoStart, timeout, value, reserved)); }
 };
 %ignore DAQmxBaseCfgInputBuffer;
 %extend Task {
   void cfg_input_buffer(uInt32 numSampsPerChan)
-    { handle_DAQmx_error(DAQmxBaseCfgInputBuffer((TaskHandle)(void *)$self, numSampsPerChan)); }
+    { handle_DAQmx_error(DAQmxBaseCfgInputBuffer((TaskHandle)(void *)self, numSampsPerChan)); }
 };
 #define VAL_SWITCH_TOPOLOGY_1127_1_WIRE_64X1_MUX "1127/1-Wire 64x1 Mux" // 1127/1-Wire 64x1 Mux
 #define VAL_SWITCH_TOPOLOGY_1127_2_WIRE_32X1_MUX "1127/2-Wire 32x1 Mux" // 1127/2-Wire 32x1 Mux

@@ -301,9 +301,9 @@ static VALUE dmxErrorCode(VALUE self)
     return t;
   }
   ~Task() {
-    int32 result = DAQmxBaseStopTask((TaskHandle)(void *)$self);
-    result = DAQmxBaseClearTask((TaskHandle)(void *)$self);
-    free($self);
+    int32 result = DAQmxBaseStopTask((TaskHandle)(void *)self);
+    result = DAQmxBaseClearTask((TaskHandle)(void *)self);
+    free(self);
   }
 };
 

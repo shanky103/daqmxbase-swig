@@ -45,7 +45,6 @@ ifeq ($(OS),Windows_NT) # Win32
 		# Cygwin Win32
 		NI_DIR?=$(shell cygpath -u "$(NI_WIN_DIR)")
 		CFLAGS+= -mcygwin
-		CPPFLAGS+= -I/usr/include/cygwin
 		NI_HEADER:=$(shell cygpath -u "$(NI_INC_DIR)/NIDAQmxBase.h")
 		ifeq ($(CYGWIN_VIM),no)
 			RUBYPATH:=$(shell cygpath -m $(shell ruby -e 'print $$:.join(" ")') | tr '\n' ',')

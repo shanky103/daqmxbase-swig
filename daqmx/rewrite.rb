@@ -72,7 +72,7 @@ ARGF.each_line do |line|
 
     if hasSelf
       rubyname = rubyname.sub(/_task$/, '')
-      callArgs.unshift("(TaskHandle)(void *)$self")
+      callArgs.unshift("(TaskHandle)(void *)self")
     end
 
     # if we haven't figured out how to handle it yet, just skip it
