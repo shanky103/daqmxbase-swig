@@ -2,6 +2,12 @@
 #
 # voltmeter.rb: sample program to do multi-channel multi-sample
 # analog input and display repeatedly
+#
+# Displays all 4 differential input channel voltages repeatedly;
+#
+# If you enter an AO channel number [1/0], a space, and a value, followed by a
+# space or CR you will set the analog output as well.
+#
 #-----------------------------------------------------------------------
 # ruby-daqmxbase: A SWIG interface for Ruby and the NI-DAQmx Base data
 # acquisition library.
@@ -30,7 +36,7 @@ BEGIN {
 }
 
 require 'daqmxbase'
-require 'arrayStats'
+require 'arraystats'
 
 include Daqmxbase
 
@@ -115,6 +121,7 @@ begin
   while true
     doOneScan(output)
     begin
+      # process additional input chars for chnum/chval AO setting
       inputLine = inputLine + input.read_nonblock(100)
       inputLine.sub!(/^([01])\s+([0-9.]+)\s*/) { |match|
         chNum = $1.to_i

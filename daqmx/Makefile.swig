@@ -95,7 +95,7 @@ all: dll .vimrc
 ifeq ($(CYGWIN_VIM),no)
 	echo  >$@ 'set path+=$(subst \ ,\\ ,$(subst \,\\,$(NI_WIN_INC_DIR)))'
 else
-	echo  >$@ 'set path+=$(subst \,\\\,$(NI_INC_DIR))'
+	echo  >$@ 'set path+=$(subst \,\\,$(NI_INC_DIR))'
 endif
 	echo >>$@ 'set path+=$(RUBYPATH)'
 	echo >>$@ 'set path+=$(SWIGPATH)'
