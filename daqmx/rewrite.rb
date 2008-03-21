@@ -85,6 +85,7 @@ ARGF.each_line do |line|
       puts <<EOF
 %ignore #{libname};
 %extend Task {
+%feature("autodoc", "1");
   void #{rubyname}(#{args.join(", ")})
     { handle_DAQmx_error(#{libname}(#{callArgs.join(", ")})); }
 };
@@ -92,6 +93,7 @@ EOF
     else
       puts <<EOF
 %ignore #{libname};
+%feature("autodoc", "1");
 %inline %{
   void #{rubyname}(#{args.join(", ")})
     { handle_DAQmx_error(#{libname}(#{callArgs.join(", ")})); }

@@ -35,6 +35,11 @@ BEGIN {
   trap('INT') { exit }
 }
 
+if ARGV[0] == '-h'
+  puts "Usage: ruby #{$0} [-d]\n   -d chooses diff channels, else unipolar."
+  exit 
+end
+
 require 'daqmxbase'
 require 'arraystats'
 
@@ -45,9 +50,17 @@ $aiTask = nil
 $aoTask = nil
 
 # Input channel parameters
-$aiChans = "Dev1/ai0:3"	# all 4 diff channels
-$nAIChans = 4
-$terminalConfig = VAL_DIFF
+if ARGV[0] == "-d"
+  $aiChans = "Dev1/ai0:3"	# all 4 diff channels
+  $nAIChans = 4
+  $terminalConfig = VAL_DIFF
+  puts("Differential channels 0:3")
+else
+  $aiChans = "Dev1/ai0:7"	# all 8 unipolar channels
+  $nAIChans = 8
+  $terminalConfig = VAL_RSE
+  puts("Single-ended channels 0:7")
+end
 $aiMin = 0.0
 $aiMax = 2.0
 $units = VAL_VOLTS

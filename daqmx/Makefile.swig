@@ -75,7 +75,8 @@ NI_HEADER:=$(subst /\,,$(patsubst %,%\,$(NI_HEADER)/))
 
 # -debug_typemap -Wall -w322
 # -dump_typedef -dump_classes
-SWIG_OPTS+= -ruby -Fstandard 
+# -features autodoc
+SWIG_OPTS+= -ruby -Fstandard
 CPPFLAGS+= -I \"$(NI_INC_DIR)\"
 CFLAGS+= -g -Wall -Wno-redundant-decls
 
@@ -89,7 +90,7 @@ DECLS=$(MODULE)_decls.i
 .PHONY: all install clean test debug dll
 .PRECIOUS: $(DECLS) .vimrc
 
-all: dll .vimrc
+all: dll htmldoc .vimrc
 
 .vimrc: $(MAKEFILE_LIST)
 ifeq ($(CYGWIN_VIM),no)
@@ -107,6 +108,9 @@ endif
 
 dll: Makefile
 	$(MAKE) all
+
+htmldoc: $(WRAPPER)
+	rdoc -f html -a $(WRAPPER)
 
 install: Makefile
 	$(MAKE) install

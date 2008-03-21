@@ -21,7 +21,7 @@
 //
 
 // Will be Ruby module named Daqmxbase
-%module  daqmxbase
+%module(docstring="A SWIG interface for Ruby and the NI-DAQmx Base data acquisition library") daqmxbase
 
 %include "typemaps.i"
 %include "exception.i"
