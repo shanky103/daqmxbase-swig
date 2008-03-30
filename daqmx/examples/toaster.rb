@@ -152,7 +152,7 @@ task.start()
 File.open("toaster-#{Time.now.to_i}.csv", 'w') do |csvfile|
   csvfile.puts "# #{Time.now}\ntime,tempF,RH"
 
-  samplePeriod = 1.0
+  samplePeriod = 0.5
   pointsToRead = samplesPerChan
   startTime = Time.now
   nextSample = startTime + samplePeriod
