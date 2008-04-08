@@ -372,6 +372,18 @@
   void create_cipulse_width_chan(const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 startingEdge, const char customScaleName[])
     { handle_DAQmx_error(DAQmxBaseCreateCIPulseWidthChan((TaskHandle)(void *)self, counter, nameToAssignToChannel, minVal, maxVal, units, startingEdge, customScaleName)); }
 };
+<<<<<<< .mine
+%ignore DAQmxBaseCreateCILinEncoderChan;
+%extend Task {
+  void create_cilin_encoder_chan(const char counter[], const char nameToAssignToChannel[], int32 decodingType, bool32 ZidxEnable, float64 ZidxVal, int32 ZidxPhase, int32 units, float64 distPerPulse, float64 initialPos, const char customScaleName[])
+    { handle_DAQmx_error(DAQmxBaseCreateCILinEncoderChan((TaskHandle)(void *)self, counter, nameToAssignToChannel, decodingType, ZidxEnable, ZidxVal, ZidxPhase, units, distPerPulse, initialPos, customScaleName)); }
+};
+%ignore DAQmxBaseCreateCIAngEncoderChan;
+%extend Task {
+  void create_ciang_encoder_chan(const char counter[], const char nameToAssignToChannel[], int32 decodingType, bool32 ZidxEnable, float64 ZidxVal, int32 ZidxPhase, int32 units, uInt32 pulsesPerRev, float64 initialAngle, const char customScaleName[])
+    { handle_DAQmx_error(DAQmxBaseCreateCIAngEncoderChan((TaskHandle)(void *)self, counter, nameToAssignToChannel, decodingType, ZidxEnable, ZidxVal, ZidxPhase, units, pulsesPerRev, initialAngle, customScaleName)); }
+};
+=======
 %ignore DAQmxBaseCreateCILinEncoderChan;
 %extend Task {
 %feature("autodoc", "1");
@@ -384,6 +396,7 @@
   void create_ciang_encoder_chan(const char counter[], const char nameToAssignToChannel[], int32 decodingType, bool32 ZidxEnable, float64 ZidxVal, int32 ZidxPhase, int32 units, uInt32 pulsesPerRev, float64 initialAngle, const char customScaleName[])
     { handle_DAQmx_error(DAQmxBaseCreateCIAngEncoderChan((TaskHandle)(void *)self, counter, nameToAssignToChannel, decodingType, ZidxEnable, ZidxVal, ZidxPhase, units, pulsesPerRev, initialAngle, customScaleName)); }
 };
+>>>>>>> .r88
 %ignore DAQmxBaseCreateCOPulseChanFreq;
 %extend Task {
 %feature("autodoc", "1");
