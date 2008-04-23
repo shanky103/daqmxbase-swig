@@ -30,7 +30,10 @@
 $ignored = %w{
   DAQmxBaseCreateTask
   DAQmxBaseLoadTask
-  }
+  DAQmxBaseCreateCILinEncoderChan
+  DAQmxBaseCreateCIAngEncoderChan
+}
+
 puts("// Automatically generated from NIDAQmxBase.h header file.")
 puts("// Do not edit.")
 
