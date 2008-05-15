@@ -30,29 +30,36 @@ RUBY?=ruby
 
 # for .vimrc:
 #
-RUBYPATH?=$(shell ruby -e 'print $$:.join(",")')
+RUBYPATH?=$(shell $(RUBY) -e 'print $$:.join(",")')
 SWIGPATH?=$(SWIGLIB)/ruby,$(SWIGLIB)
 
 ifeq ($(OS),Windows_NT) # Win32
 	CYGWIN_VIM?=no
-	NI_WIN_DIR?=$(PROGRAMFILES)/National Instruments/NI-DAQmx Base
+	NI_WIN_DIR?=$(PROGRAMFILES:\=/)/National Instruments/NI-DAQmx Base
 	NI_WIN_INC_DIR?=$(NI_WIN_DIR)/Include
-	LDFLAGS+= -Wl,--export-all-symbols -Wl,-L\"$(NI_DIR)/Lib\" -Wl,--dll-search-prefix=\"\" \"-Wl,--exclude-symbols,\x7fnidaqmxbase_NULL_THUNK_DATA\" --enable-extra-pe-debug 
+	LDFLAGS+= -Wl,--export-all-symbols
+	LDFLAGS+= -Wl,-L\"$(NI_DIR)/Lib\"
+	LDFLAGS+= -Wl,--dll-search-prefix=\"\"
+	LDFLAGS+= \"-Wl,--exclude-symbols,\x7fnidaqmxbase_NULL_THUNK_DATA\"
+	# LDFLAGS+= -Wl,--enable-extra-pe-debug 
+	LDFLAGS+= -Wl,--dll
 	LIBS+= -lnidaqmxbase
-	OSTYPE?=$(shell uname -o)
+	OSTYPE:=$(findstring CYGWIN,$(strip $(shell uname)))
 	NI_INC_DIR=$(NI_DIR)/Include
-	ifeq ($(OSTYPE),Cygwin)
+	ifeq ($(OSTYPE),CYGWIN)
 		# Cygwin Win32
 		NI_DIR?=$(shell cygpath -u "$(NI_WIN_DIR)")
 		CFLAGS+= -mcygwin
 		NI_HEADER:=$(shell cygpath -u "$(NI_INC_DIR)/NIDAQmxBase.h")
 		ifeq ($(CYGWIN_VIM),no)
-			RUBYPATH:=$(shell cygpath -m $(shell ruby -e 'print $$:.join(" ")') | tr '\n' ',')
+			RUBYPATH:=$(shell cygpath -m $(shell $(RUBY) -e 'print $$:.join(" ")') | tr '\n' ',')
 			SWIGPATH:=$(shell cygpath -m $(SWIGLIB)/ruby $(SWIGLIB) | tr '\n' ',')
 		endif	# not CYGWIN_VIM
 	else	# OSTYPE not Cygwin, but still Win32
 		NI_DIR?=$(NI_WIN_DIR)
+		NI_HEADER:=$(NI_INC_DIR)/NIDAQmxBase.h
 		CFLAGS+= -mno-cygwin
+		CPPFLAGS+= -I$(shell $(RUBY) -e 'print $$:.join(" -I")')
 	endif	# OSTYPE Cygwin
 else # not Windows_NT
 	OSTYPE?=$(shell uname -s)
@@ -122,7 +129,7 @@ $(WRAPPER): $(DECLS) $(INTERFACE)
 	$(SWIG) $(SWIG_OPTS) -I$(NI_INC_DIR) -o $@ $(INTERFACE)
 
 $(DECLS): rewrite.rb $(NI_HEADER)
-	ruby rewrite.rb $(NI_HEADER) > $@
+	$(RUBY) rewrite.rb $(NI_HEADER) > $@
 
 extconf.rb: $(MAKEFILE_LIST)
 	echo 'require "mkmf"' > $@
