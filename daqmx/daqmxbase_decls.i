@@ -372,6 +372,8 @@
   void create_cipulse_width_chan(const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 startingEdge, const char customScaleName[])
     { handle_DAQmx_error(DAQmxBaseCreateCIPulseWidthChan((TaskHandle)(void *)self, counter, nameToAssignToChannel, minVal, maxVal, units, startingEdge, customScaleName)); }
 };
+%ignore DAQmxBaseCreateCILinEncoderChan;
+%ignore DAQmxBaseCreateCIAngEncoderChan;
 %ignore DAQmxBaseCreateCOPulseChanFreq;
 %extend Task {
 %feature("autodoc", "1");
