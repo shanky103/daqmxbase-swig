@@ -70,6 +70,10 @@ else # not Windows_NT
 		NI_HEADER:=$(NI_INC_DIR)/NIDAQmxBase.h
 		LIBS+= -framework nidaqmxbase -framework nidaqmxbaselv
 	else # OS not Windows_NT, not Darwin either
+		NI_DIR?=/usr/local/natinst/nidaqmxbase
+		NI_INC_DIR=$(NI_DIR)/include
+		NI_HEADER:=$(NI_INC_DIR)/NIDAQmxBase.h
+		LIBS+=-lnidaqmxbase
 	endif # OSTYPE Darwin
 endif # OS Windows_NT
 

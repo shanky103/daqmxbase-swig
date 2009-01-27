@@ -1,6 +1,6 @@
-set path+=C:/Program\\\ Files/National\\\ Instruments/NI-DAQmx\\\ Base/Include
-set path+=C:/cygwin/usr/local/lib/ruby/site_ruby/1.8,C:/cygwin/usr/local/lib/ruby/site_ruby/1.8/i386-cygwin,C:/cygwin/usr/local/lib/ruby/site_ruby,C:/cygwin/usr/local/lib/ruby/1.8,C:/cygwin/usr/local/lib/ruby/1.8/i386-cygwin,.,
-set path+=C:/cygwin/usr/share/swig/1.3.29/ruby,C:/cygwin/usr/share/swig/1.3.29,
+set path+=/usr/local/natinst/nidaqmxbase/include
+set path+=/usr/local/lib/site_ruby/1.8,/usr/local/lib/site_ruby/1.8/i486-linux,/usr/local/lib/site_ruby/1.8/i386-linux,/usr/local/lib/site_ruby,/usr/lib/ruby/1.8,/usr/lib/ruby/1.8/i486-linux,/usr/lib/ruby/1.8/i386-linux,.
+set path+=/usr/share/swig1.3/ruby,/usr/share/swig1.3
 set makeprg=make\ -f\ Makefile.swig
 set isfname+=\ 
 set errorformat^=%f:%l:\ %m
